@@ -143,10 +143,15 @@ data
 specified_Year =  subset(data,data$Year >= 1880)
 year_temp_data <-  specified_Year %>% group_by(Region, Year) %>% 
 summarize(mean(AvgTemperature))
-p = ggplot() + 
-  geom_line(data = year_temp_data, aes(x = Year, y = `mean(AvgTemperature)`, group = Region, ,color=Region))+
+year_temp_data_line_plot = ggplot() + 
+  geom_line(data = year_temp_data, aes(x = Year, y = `mean(AvgTemperature)`, group = Region,color=Region)) +
   xlab('Year') +
-  ylab('Temperature Level')
+  ylab('Temperature Level') 
+year_temp_data_qq_plot <- ggplot(year_temp_data, aes(sample = `mean(AvgTemperature)`, colour = Region)) +
+  stat_qq() +
+  stat_qq_line()
+print(year_temp_data_line_plot)
+print(year_temp_data_qq_plot)
 
-print(p)
+
 ```
