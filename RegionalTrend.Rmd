@@ -47,7 +47,8 @@ loadPkg("xtable")
 loadPkg("kableExtra")
 loadPkg("stringi")
 loadPkg("readr")
-loadPkg("corrplot")
+loadPkg("dplyr")
+loadPkg("ggplot2")
 
 xkabledply = function(modelsmmrytable, title="Table", digits = 4, pos="left", bso="striped", wide=FALSE) { 
   #' Combining base::summary, xtable, and kableExtra, to easily display model summary. 
@@ -128,4 +129,24 @@ xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", b
   if (wide) { vifs <- t(vifs) }
   xkabledply( vifs, title=title, digits = digits, pos=pos, bso=bso )
 }
+```
+### Step 1  
+**Import the data**
+```{r step01}
+data <- data.frame(read_csv("/Users/babayegar/Downloads/DATS6101/city_temperature.csv"))
+data
+```
+
+### Step 2  
+**Import the data**
+```{r step02}
+specified_Year =  subset(data,data$Year >= 1880)
+year_temp_data <-  specified_Year %>% group_by(Region, Year) %>% 
+summarize(mean(AvgTemperature))
+p = ggplot() + 
+  geom_line(data = year_temp_data, aes(x = Year, y = `mean(AvgTemperature)`, group = Region, ,color=Region))+
+  xlab('Year') +
+  ylab('Temperature Level')
+
+print(p)
 ```
