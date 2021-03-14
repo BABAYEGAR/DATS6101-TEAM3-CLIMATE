@@ -145,24 +145,26 @@ global_temps$Year <- as.integer(format(global_temps$Year, format="%Y"))
 ### Step 2  
 **Analyze Global Temperature by regions**
 ```{r step02}
-specified_Year =  subset(global_temps,global_temps$Year >= 1880)
-specified_Year
-year_temp_data <-  specified_Year %>% group_by(Region, Year) %>% 
+global_temps <-  na.omit(global_temps)
+regional_year_temp_data <-  global_temps %>% group_by(Region, Year) %>% 
 summarize(mean(AverageTemperature))
 
-year_temp_data_line_plot = ggplot() + 
-  geom_line(data = year_temp_data, aes(x = Year, y = `mean(AverageTemperature)`, group = Region,color=Region)) +
+regional_year_temp_data_line_plot = ggplot() + 
+  geom_line(data = regional_year_temp_data, aes(x = Year, y = `mean(AverageTemperature)`, group = Region,color=Region)) +
   xlab('Year') +
   ylab('Temperature Level')  +
   geom_point(size = 4, shape = 21)
 
-year_temp_data_qq_plot <- ggplot(year_temp_data, aes(sample = `mean(AverageTemperature)`, colour = Region)) +
+regional_year_temp_data_qq_plot <- ggplot(regional_year_temp_data, aes(sample = `mean(AverageTemperature)`, colour = Region)) +
   stat_qq() +
   stat_qq_line()
 
-print(year_temp_data_line_plot)
-print(year_temp_data_qq_plot)
+regional_year_temp_data_boxplot <- ggplot(regional_year_temp_data, aes(x=as.factor(regional_year_temp_data$Region), y=`mean(AverageTemperature)`, color=Region)) + 
+  geom_boxplot()
 
+print(regional_year_temp_data_line_plot)
+print(regional_year_temp_data_qq_plot)
+print(regional_year_temp_data_boxplot)
 
 ```
 
@@ -172,28 +174,31 @@ print(year_temp_data_qq_plot)
 co2_emissions <- data.frame(read_csv("co2.csv"))
 co2_emissions$Region <- countrycode(sourcevar = co2_emissions[, "Country"],origin = "country.name",destination = "continent")
 co2_emissions <- data.frame(co2_emissions[ , c(-2,-3,-4)])
-co2_emissions <- melt(co2_emissions, id=c("Country","Region"))
+co2_emissions <- na.omit(melt(co2_emissions, id=c("Country","Region")))
 names(co2_emissions)[3] <- 'Year'
 names(co2_emissions)[4] <- 'Emission'
 co2_emissions$Year <- as.integer(substring(co2_emissions$Year, 2,5))
 co2_emissions$Emission <- as.numeric(format(co2_emissions$Emission, scientific = FALSE))
 
-year_co2_emissions <-  co2_emissions %>% group_by(Region, Year) %>% 
+regional_year_co2_emissions <-  co2_emissions %>% group_by(Region, Year) %>% 
 summarize(mean(Emission))
-year_co2_emissions
 
-year_co2_emissions_line_plot = ggplot() + 
-  geom_line(data = year_co2_emissions, aes(x = Year, y = `mean(Emission)`, group = Region,color=Region)) +
+regional_year_co2_emissions_line_plot = ggplot() + 
+  geom_line(data = regional_year_co2_emissions, aes(x = Year, y = `mean(Emission)`, group = Region,color=Region)) +
   xlab('Year') +
   ylab('Emissions')  +
   geom_point(size = 4, shape = 21)
 
-year_co2_emissions_qq_plot <- ggplot(year_co2_emissions, aes(sample = `mean(Emission)`, colour = Region)) +
+regional_year_co2_emissions_qq_plot <- ggplot(regional_year_co2_emissions, aes(sample = `mean(Emission)`, colour = Region)) +
   stat_qq() +
   stat_qq_line()
 
-print(year_co2_emissions_line_plot)
-print(year_co2_emissions_qq_plot)
+regional_year_co2_emissions_boxplot <- ggplot(regional_year_co2_emissions, aes(x=as.factor(regional_year_co2_emissions$Region), y=`mean(Emission)`, color=Region)) + 
+  geom_boxplot()
+
+print(regional_year_co2_emissions_line_plot)
+print(regional_year_co2_emissions_qq_plot)
+print(regional_year_co2_emissions_boxplot)
 
 
 ```
