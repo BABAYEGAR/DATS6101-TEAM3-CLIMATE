@@ -49,6 +49,8 @@ loadPkg("stringi")
 loadPkg("readr")
 loadPkg("dplyr")
 loadPkg("ggplot2")
+loadPkg("countrycode")
+loadPkg("reshape")
 
 xkabledply = function(modelsmmrytable, title="Table", digits = 4, pos="left", bso="striped", wide=FALSE) { 
   #' Combining base::summary, xtable, and kableExtra, to easily display model summary. 
@@ -133,25 +135,65 @@ xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", b
 ### Step 1  
 **Import the data**
 ```{r step01}
-data <- data.frame(read_csv("/Users/babayegar/Downloads/DATS6101/city_temperature.csv"))
-data
+global_temps <- data.frame(read_csv("GlobalTemp.csv"))
+global_temps$Region <- countrycode(sourcevar = global_temps[, "Country"],origin = "country.name",destination = "continent")
+names(global_temps)[1] <- 'Year'
+global_temps$Year <- as.integer(format(global_temps$Year, format="%Y"))
+
 ```
 
 ### Step 2  
-**Import the data**
+**Analyze Global Temperature by regions**
 ```{r step02}
-specified_Year =  subset(data,data$Year >= 1880)
+specified_Year =  subset(global_temps,global_temps$Year >= 1880)
+specified_Year
 year_temp_data <-  specified_Year %>% group_by(Region, Year) %>% 
-summarize(mean(AvgTemperature))
+summarize(mean(AverageTemperature))
+
 year_temp_data_line_plot = ggplot() + 
-  geom_line(data = year_temp_data, aes(x = Year, y = `mean(AvgTemperature)`, group = Region,color=Region)) +
+  geom_line(data = year_temp_data, aes(x = Year, y = `mean(AverageTemperature)`, group = Region,color=Region)) +
   xlab('Year') +
-  ylab('Temperature Level') 
-year_temp_data_qq_plot <- ggplot(year_temp_data, aes(sample = `mean(AvgTemperature)`, colour = Region)) +
+  ylab('Temperature Level')  +
+  geom_point(size = 4, shape = 21)
+
+year_temp_data_qq_plot <- ggplot(year_temp_data, aes(sample = `mean(AverageTemperature)`, colour = Region)) +
   stat_qq() +
   stat_qq_line()
+
 print(year_temp_data_line_plot)
 print(year_temp_data_qq_plot)
+
+
+```
+
+### Step 3  
+**Analyze the Co2 Emmisions by Regions**
+```{r step02}
+co2_emissions <- data.frame(read_csv("co2.csv"))
+co2_emissions$Region <- countrycode(sourcevar = co2_emissions[, "Country"],origin = "country.name",destination = "continent")
+co2_emissions <- data.frame(co2_emissions[ , c(-2,-3,-4)])
+co2_emissions <- melt(co2_emissions, id=c("Country","Region"))
+names(co2_emissions)[3] <- 'Year'
+names(co2_emissions)[4] <- 'Emission'
+co2_emissions$Year <- as.integer(substring(co2_emissions$Year, 2,5))
+co2_emissions$Emission <- as.numeric(format(co2_emissions$Emission, scientific = FALSE))
+
+year_co2_emissions <-  co2_emissions %>% group_by(Region, Year) %>% 
+summarize(mean(Emission))
+year_co2_emissions
+
+year_co2_emissions_line_plot = ggplot() + 
+  geom_line(data = year_co2_emissions, aes(x = Year, y = `mean(Emission)`, group = Region,color=Region)) +
+  xlab('Year') +
+  ylab('Emissions')  +
+  geom_point(size = 4, shape = 21)
+
+year_co2_emissions_qq_plot <- ggplot(year_co2_emissions, aes(sample = `mean(Emission)`, colour = Region)) +
+  stat_qq() +
+  stat_qq_line()
+
+print(year_co2_emissions_line_plot)
+print(year_co2_emissions_qq_plot)
 
 
 ```
