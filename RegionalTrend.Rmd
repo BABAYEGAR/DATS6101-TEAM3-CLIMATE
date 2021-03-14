@@ -154,17 +154,18 @@ regional_year_temp_data_line_plot = ggplot() +
   xlab('Year') +
   ylab('Temperature Level')  +
   geom_point(size = 4, shape = 21)
-
 regional_year_temp_data_qq_plot <- ggplot(regional_year_temp_data, aes(sample = `mean(AverageTemperature)`, colour = Region)) +
   stat_qq() +
   stat_qq_line()
-
 regional_year_temp_data_boxplot <- ggplot(regional_year_temp_data, aes(x=as.factor(regional_year_temp_data$Region), y=`mean(AverageTemperature)`, color=Region)) + 
   geom_boxplot()
+regional_year_temp_data_barchart <- ggplot(data=regional_year_temp_data, aes(x=Year, y=`mean(AverageTemperature)`,fill=Region)) +
+  geom_bar(stat="identity")
 
 print(regional_year_temp_data_line_plot)
 print(regional_year_temp_data_qq_plot)
 print(regional_year_temp_data_boxplot)
+print(regional_year_temp_data_barchart)
 
 ```
 
@@ -196,9 +197,12 @@ regional_year_co2_emissions_qq_plot <- ggplot(regional_year_co2_emissions, aes(s
 regional_year_co2_emissions_boxplot <- ggplot(regional_year_co2_emissions, aes(x=as.factor(regional_year_co2_emissions$Region), y=`mean(Emission)`, color=Region)) + 
   geom_boxplot()
 
+regional_year_co2_emissions_barchart <- ggplot(data=regional_year_temp_data, aes(x=Year, y=`mean(AverageTemperature)`,fill=Region)) +
+  geom_bar(stat="identity")
+
 print(regional_year_co2_emissions_line_plot)
 print(regional_year_co2_emissions_qq_plot)
 print(regional_year_co2_emissions_boxplot)
-
+print(regional_year_co2_emissions_barchart)
 
 ```
