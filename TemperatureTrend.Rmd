@@ -51,6 +51,9 @@ loadPkg("dplyr")
 loadPkg("ggplot2")
 loadPkg("countrycode")
 loadPkg("reshape")
+loadPkg("corrplot")
+loadPkg("tidyr")
+
 
 xkabledply = function(modelsmmrytable, title="Table", digits = 4, pos="left", bso="striped", wide=FALSE) { 
   #' Combining base::summary, xtable, and kableExtra, to easily display model summary. 
@@ -136,10 +139,14 @@ xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", b
 ###Step 1
 **Import the data**
 ```{r step1}
-global_temps <- data.frame(read.csv("GlobalTemp.csv"))
-
+global_temps <- data.frame(read_csv("GlobalTemp.csv"))
+names(global_temps)[1] <- 'Year'
+global_temps$Year <- as.integer(format(global_temps$Year, format="%Y"))
 global_temps$Decade <- (global_temps$Year - global_temps$Year %% 10)
 global_temps$Century <- (global_temps$Year - global_temps$Year %% 100)
+global_temps
+
+
 ```
 
 ###Step 2
@@ -203,12 +210,10 @@ decade_year_temp_data_boxplot
 ***Data Cleaning for Linear Regression**
 ```{r step4}
 #format dataset to single observation by country per year
-summary_temp_data <-  global_temps %>% group_by(Year, Country, Region) %>% 
+summary_temp_data <-  global_temps %>% group_by(Year, Country) %>% 
 summarize(mean(AverageTemperature))
 
 #reformat World Bank datasets from wide to long (years 1990-2013)
-loadPkg("tidyr")
-loadPkg("readxl")
 
 forest_area <- data.frame(read_xls("forest_area.xls"))
 forest_area <- subset(forest_area, select = -c(2:34))
@@ -250,7 +255,7 @@ climate_change <- merge(climate_change3, co2_emissions_long, by=c("Country", "Ye
 
 #merge with temperature data set
 summary_temp_data <- subset(summary_temp_data, summary_temp_data$Year >= 1990)
-colnames(summary_temp_data) <- c("Year", "Country", "Region", "Temperature")
+colnames(summary_temp_data) <- c("Year", "Country", "Temperature")
 
 temp_data <- merge(climate_change, summary_temp_data, by=c("Country", "Year"))
 
@@ -260,15 +265,16 @@ temp_data <- merge(climate_change, summary_temp_data, by=c("Country", "Year"))
 ***Linear Regression***
 ```{r step5}
 #correlation plot
-
 #remove categorical variables for plot
-temp_data_cor <- subset(temp_data, select=-c(1,2,8))
+temp_data_cor <- subset(temp_data, select=-c(1,2))
+temp_data_cor[is.na(temp_data_cor)] = 0
+temp_data_cor
 tempcor <- cor(temp_data_cor)
 tempcor
-corrplot(tempcor, method = "number", type="upper")
+corrplot(tempcor, method = "number")
 
-#linear model
-model1 <- lm(Temperature ~ Forest_Area + Renew_Energy_Pct + Population_Total + Energy_Use + Co2_Emissions, data=temp_data)
+#linear model ##Note: Model variables are selected based on varibales closer to 1 and -1
+model1 <- lm(Temperature ~ Renew_Energy_Pct + Energy_Use + Co2_Emissions + Forest_Area  + Population_Total, data=temp_data)
 summary(model1)
 ```
 

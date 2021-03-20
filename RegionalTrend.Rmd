@@ -131,6 +131,10 @@ xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", b
   if (wide) { vifs <- t(vifs) }
   xkabledply( vifs, title=title, digits = digits, pos=pos, bso=bso )
 }
+fahr_to_celsius <- function(fahr) {
+  celsius <- (fahr - 32) *0.56
+  celsius
+}
 ```
 ### Step 1  
 **Import the data**
@@ -148,7 +152,6 @@ global_temps$Year <- as.integer(format(global_temps$Year, format="%Y"))
 global_temps <-  na.omit(global_temps)
 regional_year_temp_data <-  global_temps %>% group_by(Region, Year) %>% 
 summarize(mean(AverageTemperature))
-
 regional_year_temp_data_line_plot = ggplot() + 
   geom_line(data = regional_year_temp_data, aes(x = Year, y = `mean(AverageTemperature)`, group = Region,color=Region)) +
   xlab('Year') +
@@ -172,7 +175,8 @@ print(regional_year_temp_data_barchart)
 ### Step 3  
 **Analyze the Co2 Emmisions by Regions**
 ```{r step02}
-co2_emissions <- data.frame(read_csv("co2.csv"))
+co2_emissions <- data.frame(read_xls("C02_emissions.xls"))
+names(co2_emissions)[1] <- 'Country'
 co2_emissions$Region <- countrycode(sourcevar = co2_emissions[, "Country"],origin = "country.name",destination = "continent")
 co2_emissions <- data.frame(co2_emissions[ , c(-2,-3,-4)])
 co2_emissions <- na.omit(melt(co2_emissions, id=c("Country","Region")))
