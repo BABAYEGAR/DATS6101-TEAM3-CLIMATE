@@ -53,6 +53,7 @@ loadPkg("countrycode")
 loadPkg("reshape")
 loadPkg("corrplot")
 loadPkg("tidyr")
+loadPkg("readxl")
 
 
 xkabledply = function(modelsmmrytable, title="Table", digits = 4, pos="left", bso="striped", wide=FALSE) { 
@@ -214,7 +215,6 @@ summary_temp_data <-  global_temps %>% group_by(Year, Country) %>%
 summarize(mean(AverageTemperature))
 
 #reformat World Bank datasets from wide to long (years 1990-2013)
-
 forest_area <- data.frame(read_xls("forest_area.xls"))
 forest_area <- subset(forest_area, select = -c(2:34))
 forest_area <- subset(forest_area, select = -c(26:32))
@@ -268,9 +268,7 @@ temp_data <- merge(climate_change, summary_temp_data, by=c("Country", "Year"))
 #remove categorical variables for plot
 temp_data_cor <- subset(temp_data, select=-c(1,2))
 temp_data_cor[is.na(temp_data_cor)] = 0
-temp_data_cor
 tempcor <- cor(temp_data_cor)
-tempcor
 corrplot(tempcor, method = "number")
 
 #linear model ##Note: Model variables are selected based on varibales closer to 1 and -1
