@@ -140,7 +140,7 @@ xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", b
 ###Step 1
 **Import the data**
 ```{r step1}
-global_temps <- data.frame(read_csv("GlobalTemp.csv"))
+global_temps <- data.frame(read_csv("Datasets/GlobalTemp.csv"))
 names(global_temps)[1] <- 'Year'
 global_temps$Year <- as.integer(format(global_temps$Year, format="%Y"))
 global_temps$Decade <- (global_temps$Year - global_temps$Year %% 10)
@@ -215,7 +215,7 @@ summary_temp_data <-  global_temps %>% group_by(Year, Country) %>%
 summarize(mean(AverageTemperature))
 
 #reformat World Bank datasets from wide to long (years 1990-2013)
-forest_area <- data.frame(read_xls("forest_area.xls"))
+forest_area <- data.frame(read_xls("Datasets/forest_area.xls"))
 forest_area <- subset(forest_area, select = -c(2:34))
 forest_area <- subset(forest_area, select = -c(26:32))
 colnames(forest_area) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999",
@@ -223,25 +223,25 @@ colnames(forest_area) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1
                            "2011", "2012", "2013")
 forest_area_long <- gather(forest_area, Year, Forest_Area, 2:25, factor_key = TRUE)
 
-renewable_energy_pct <- data.frame(read_xls("renewable_energy.xls"))
+renewable_energy_pct <- data.frame(read_xls("Datasets/renewable_energy.xls"))
 renewable_energy_pct <- subset(renewable_energy_pct, select = -c(2:34))
 renewable_energy_pct <- subset(renewable_energy_pct, select = -c(26:32))
 colnames(renewable_energy_pct) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",  "1999","2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013")
 renewable_energy_pct_long <- gather(renewable_energy_pct, Year, Renew_Energy_Pct, 2:25, factor_key=TRUE)
 
-population <- data.frame(read_xls("population.xls"))
+population <- data.frame(read_xls("Datasets/population.xls"))
 population <- subset(population, select = -c(2:34))
 population <- subset(population, select = -c(26:32))
 colnames(population) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",  "1999","2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013")
 population_long <- gather(population, Year, Population_Total, 2:25, factor_key=TRUE)
 
-energy_use <- data.frame(read_xls("energy_use.xls"))
+energy_use <- data.frame(read_xls("Datasets/energy_use.xls"))
 energy_use <- subset(energy_use, select = -c(2:34))
 energy_use <- subset(energy_use, select = -c(26:32))
 colnames(energy_use) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",  "1999","2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013")
 energy_use_long <- gather(energy_use, Year, Energy_Use, 2:25, factor_key=TRUE)
 
-Co2_emissions <- data.frame(read_xls("C02_emissions.xls"))
+Co2_emissions <- data.frame(read_xls("Datasets/C02_emissions.xls"))
 Co2_emissions <- subset(Co2_emissions, select = -c(2:34))
 Co2_emissions <- subset(Co2_emissions, select = -c(26:32))
 colnames(Co2_emissions) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",  "1999","2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013")
