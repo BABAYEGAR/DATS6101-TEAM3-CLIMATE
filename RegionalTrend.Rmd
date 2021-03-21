@@ -156,7 +156,7 @@ regional_year_temp_data <-  global_temps %>% group_by(Region, Year) %>%
 summarize(mean(AverageTemperature))
 regional_year_temp_data_line_plot = ggplot() + 
   geom_line(data = regional_year_temp_data, aes(x = Year, y = `mean(AverageTemperature)`, group = Region,color=Region)) +
-  labs(title="Line Plot of Temperature in Different Years across the continents") +
+  labs(title="Line Plot of Surface Temperature Across Regions", subtitle="1743-2013") +
   xlab('Year') +
   ylab('Temperature Level') +
   geom_point(size = 4, shape = 21)
@@ -166,8 +166,8 @@ regional_year_temp_data_qq_plot <- ggplot(regional_year_temp_data, aes(sample = 
   ylab('Temperature Level') +
   stat_qq() +
   stat_qq_line()
-regional_year_temp_data_boxplot <- ggplot(regional_year_temp_data, aes(x=as.factor(regional_year_temp_data$Region), y=`mean(AverageTemperature)`, color=Region)) +   labs(title="Boxplot of Temperature in Different Years across the continents") +
-  xlab('Year') +
+regional_year_temp_data_boxplot <- ggplot(regional_year_temp_data, aes(x=as.factor(regional_year_temp_data$Region), y=`mean(AverageTemperature)`, color=Region)) +   labs(title="Boxplot of Surface Temperature Across Regions", subtitle="1743-2013") +
+  xlab('Region') +
   ylab('Temperature Level') +
   geom_boxplot()
 regional_year_temp_data_barchart <- ggplot(data=regional_year_temp_data, aes(x=Year, y=`mean(AverageTemperature)`,fill=Region)) +

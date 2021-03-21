@@ -149,12 +149,32 @@ global_temps
 
 
 ```
-
 ###Step 2
-***Analyze global trends by decade and century***
+***Analyze temperature data***
 ```{r step2}
+temp_histogram <- ggplot(global_temps, aes(x=AverageTemperature)) +
+  geom_histogram(color="dark blue", fill= "lightblue") +
+  labs(title ="Histogram of Global Average Surface Temperature", subtitle="1743 - 2013") +
+  xlab("Average Surface Temperature") +
+  ylab("Frequency")
+temp_histogram
+
+temp_qq <- qqnorm(global_temps$AverageTemperature, main= "Average Surface Temperature: Normal Q-Q Plot"); qqline(global_temps$AverageTemperature, col="blue")
+temp_qq
+
+summary(global_temps)
+sd(global_temps$AverageTemperature)
+```
+
+
+
+
+###Step 3
+***Analyze global trends by decade and century***
+```{r step3}
 global_temps <-  na.omit(global_temps)
 global_temps$Century <- as.factor(global_temps$Century)
+global_temps$Decade <- as.factor(global_temps$Decade)
 
 century_temp_data <- global_temps %>% group_by(Century, Year) %>%
   summarize(mean(AverageTemperature))
@@ -176,34 +196,24 @@ century_year_temp_data_boxplot <- ggplot(century_temp_data, aes(x=as.factor(cent
   coord_cartesian(ylim = c(0, 20))
 century_year_temp_data_boxplot
 
-
-#boxplot by recent decade
-decade_temp_data <- subset(global_temps, Decade >= 1920)
-deacde_temp_data <- global_temps %>% group_by(Decade)
-decade_year_temp_data_boxplot <- ggplot(decade_temp_data, aes(x=as.factor(decade_temp_data$Decade), y=AverageTemperature, color=Decade)) +
-geom_boxplot() +
-  labs(title="Boxplot of Global Temperatures in Recent Decades") +
-  xlab("Decade") +
-  ylab("Average Temperature (celcius)")
-decade_year_temp_data_boxplot
   
 ```
 
-###Step 3
+###Step 4
 ***Hypothesis Tests***
-```{r step 3}
+```{r step 4}
 #are 1900s and 2000s statistically different?
 
 #subset data
 global_temps_1900s <- subset(global_temps, global_temps$Century == "1900")
 global_temps_2000s <- subset(global_temps, global_temps$Century == "2000")
-century_ttest <- t.test(global_temps_1900s$AverageTemperature, global_temps_2000s$AverageTemperature, conf.level = 0.95)
+century_ttest <- t.test(global_temps_1900s$AverageTemperature, global_temps_2000s$AverageTemperature, alternative = "greater", conf.level = 0.95)
 century_ttest
 ```
 
-###Step 4
+###Step 5
 ***Data Cleaning for Linear Regression**
-```{r step4}
+```{r step5}
 #format dataset to single observation by country per year
 summary_temp_data <-  global_temps %>% group_by(Year, Country) %>% 
 summarize(mean(AverageTemperature))
@@ -255,20 +265,27 @@ temp_data <- merge(climate_change, summary_temp_data, by=c("Country", "Year"))
 
 ```
 
-###Step 5
+
+
+###Step 6
 ***Linear Regression***
-```{r step5}
+```{r step6}
 #correlation plot
 #remove categorical variables for plot
 temp_data_cor <- subset(temp_data, select=-c(1,2))
 temp_data_cor[is.na(temp_data_cor)] = 0
 tempcor <- cor(temp_data_cor)
-corrplot(tempcor, method = "number")
+corrplot(tempcor, method = "number", type="upper")
 
 #linear model ##Note: Model variables are selected based on variables closer to 1 and -1
 model1 <- lm(Temperature ~ Renew_Energy_Pct + Energy_Use + Co2_Emissions + Forest_Area  + Population_Total, data=temp_data)
 summary(model1)
-```
 
+#rerun without population total
+model2 <- lm(Temperature ~ Renew_Energy_Pct + Energy_Use + Co2_Emissions + Forest_Area, data=temp_data)
+summary(model2)
+
+vif(model2)
+```
 
 
