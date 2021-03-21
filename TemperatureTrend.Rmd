@@ -167,17 +167,6 @@ century_trends_line_plot <- ggplot() +
   labs(title="Surface Temperature Trends Over Time", color="Century")
 century_trends_line_plot
 
-
-
-
-regional_year_temp_data_line_plot = ggplot() + 
-  geom_line(data = regional_year_temp_data, aes(x = Year, y = `mean(AverageTemperature)`, group = Region,color=Region)) +
-  xlab('Year') +
-  ylab('Temperature Level')  +
-  geom_point(size = 4, shape = 21)
-
-
-
 #boxplot by century
 century_year_temp_data_boxplot <- ggplot(century_temp_data, aes(x=as.factor(century_temp_data$Century), y=`mean(AverageTemperature)`, color=Century)) + 
   geom_boxplot() +
