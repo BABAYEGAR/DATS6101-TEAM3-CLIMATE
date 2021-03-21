@@ -194,6 +194,11 @@ decade_year_temp_data_boxplot
 ```{r step 3}
 #are 1900s and 2000s statistically different?
 
+#subset data
+global_temps_1900s <- subset(global_temps, global_temps$Century == "1900")
+global_temps_2000s <- subset(global_temps, global_temps$Century == "2000")
+century_ttest <- t.test(global_temps_1900s$AverageTemperature, global_temps_2000s$AverageTemperature, conf.level = 0.95)
+century_ttest
 ```
 
 ###Step 4
@@ -260,7 +265,7 @@ temp_data_cor[is.na(temp_data_cor)] = 0
 tempcor <- cor(temp_data_cor)
 corrplot(tempcor, method = "number")
 
-#linear model ##Note: Model variables are selected based on varibales closer to 1 and -1
+#linear model ##Note: Model variables are selected based on variables closer to 1 and -1
 model1 <- lm(Temperature ~ Renew_Energy_Pct + Energy_Use + Co2_Emissions + Forest_Area  + Population_Total, data=temp_data)
 summary(model1)
 ```
