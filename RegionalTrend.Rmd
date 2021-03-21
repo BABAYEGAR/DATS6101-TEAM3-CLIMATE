@@ -51,6 +51,8 @@ loadPkg("dplyr")
 loadPkg("ggplot2")
 loadPkg("countrycode")
 loadPkg("reshape")
+loadPkg("tidyr")
+loadPkg("readxl")
 
 xkabledply = function(modelsmmrytable, title="Table", digits = 4, pos="left", bso="striped", wide=FALSE) { 
   #' Combining base::summary, xtable, and kableExtra, to easily display model summary. 
@@ -181,41 +183,10 @@ print(regional_year_temp_data_barchart)
 
 ```
 
-### Step 3  
-**Analyze the Co2 Emmisions by Regions**
-```{r step02}
-co2_emissions <- data.frame(read_xls("Datasets/C02_emissions.xls"))
-names(co2_emissions)[1] <- 'Country'
-co2_emissions$Region <- countrycode(sourcevar = co2_emissions[, "Country"],origin = "country.name",destination = "continent")
-co2_emissions <- data.frame(co2_emissions[ , c(-2,-3,-4)])
-co2_emissions <- na.omit(melt(co2_emissions, id=c("Country","Region")))
-names(co2_emissions)[3] <- 'Year'
-names(co2_emissions)[4] <- 'Emission'
-co2_emissions$Year <- as.integer(substring(co2_emissions$Year, 2,5))
-co2_emissions$Emission <- as.numeric(format(co2_emissions$Emission, scientific = FALSE))
-
-regional_year_co2_emissions <-  co2_emissions %>% group_by(Region, Year) %>% 
-summarize(mean(Emission))
-
-regional_year_co2_emissions_line_plot = ggplot() + 
-  geom_line(data = regional_year_co2_emissions, aes(x = Year, y = `mean(Emission)`, group = Region,color=Region)) +
-  xlab('Year') +
-  ylab('Emissions')  +
-  geom_point(size = 4, shape = 21)
-
-regional_year_co2_emissions_qq_plot <- ggplot(regional_year_co2_emissions, aes(sample = `mean(Emission)`, colour = Region)) +
-  stat_qq() +
-  stat_qq_line()
-
-regional_year_co2_emissions_boxplot <- ggplot(regional_year_co2_emissions, aes(x=as.factor(regional_year_co2_emissions$Region), y=`mean(Emission)`, color=Region)) + 
-  geom_boxplot()
-
-regional_year_co2_emissions_barchart <- ggplot(data=regional_year_temp_data, aes(x=Year, y=`mean(AverageTemperature)`,fill=Region)) +
-  geom_bar(stat="identity")
-
-print(regional_year_co2_emissions_line_plot)
-print(regional_year_co2_emissions_qq_plot)
-print(regional_year_co2_emissions_boxplot)
-print(regional_year_co2_emissions_barchart)
-
+### Step 3 ANOVA Test
+Let us run the test, and look at the results:  
+```{r step04}
+reginal_aov = aov(`mean(AverageTemperature)` ~ Region, data = regional_year_temp_data)
+reginal_aov_summary = summary(reginal_aov)
+xkabledply(reginal_aov_summary)
 ```
