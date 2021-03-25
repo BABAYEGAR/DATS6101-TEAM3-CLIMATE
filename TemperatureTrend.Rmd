@@ -275,7 +275,7 @@ tempcor <- cor(temp_data_cor)
 corrplot(tempcor, method = "number", type="upper")
 
 #linear model ##Note: Model variables are selected based on variables closer to 1 and -1
-model1 <- lm(Temperature ~ Renew_Energy_Pct + Co2_Emissions + Forest_Area  + Population_Total, data=temp_data)
+model1 <- lm(Temperature ~ Renew_Energy_Pct + Energy_Use + Co2_Emissions + Forest_Area  + Population_Total, data=temp_data)
 summary(model1)
 
 #rerun without population total
