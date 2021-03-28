@@ -154,10 +154,6 @@ While this topic has been extensively researched, many climate change studies ar
 
 ### 2.1 Origin
 
-To answer the first SMART question, a combination of boxplots, histograms, and line graphs were used. Upon preliminary testing, it was found that decadal temperature changes were too similar to show any distinct differences.  Instead, a centurial time scale was used.  A two-sample t-test and an ANOVA were used to identify if average temperatures were different in the 1990s and 2000s and if surface temperatures were different across regions respectively. 
-
-For the second SMART question, a linear model was constructed using the following variables: forest area, renewable energy percentage, population totals, energy use, CO2 emissions, and temperatures to predict surface temperatures. 
-
 This project will explore regional and global records of temperature using open source earth surface temperature data from Kaggle and the World Bank. 
 
 The first dataset from Kaggle contains average surface temperature by country from 1743 to 2013. This dataset consists of more than 544,811 observations and contains four variables: year, average temperature, average temperature uncertainty, and the country in which these  temperatures were recorded.  Using this dataset, regional and global temperature trends were explored. 
@@ -489,15 +485,30 @@ For all regions previously stated in the boxplot analysis, there were noticeable
 According to the equation, the most influential factor in surface temperature increase is CO2 emissions, which contributes the most to temperature rise. Renewable energy percentage was also found to have a minimal contribution to surface temperature rise, while energy use was found to detract from surface temperature increase. Forested area was also linked to decreases in surface temperature by the revised model and this is consistent with studies that indicate forests to be carbon sinks (Luyssaert et al., 2008).
 
 # 8. Bibliography
+Kaggle. (1743–2013). Climate Change: Earth Surface Temperature Data [Dataset]. 
+https://www.kaggle.com/berkeleyearth/climate-change-earth-surface-temperature-data
 
 Luyssaert, S., Schulze, E. D., Börner, A., Knohl, A., Hessenmöller, D., Law, B. E., ... & Grace, J. 
 (2008). Old-growth forests as global carbon sinks. Nature, 455(7210), 213-215.
 
-
 Mikhaylov, A., Moiseev, N., Aleshin, K., & Burkhardt, T. (2020). Global climate change and 
 greenhouse effect. Entrepreneurship and Sustainability Issues, 7(4), 2897.
- 
+
 Overland, J. E., Hanna, E., Hanssen-Bauer, I., Kim, S. J., Walsh, J. E., Wang, M., Bhatt, U.S., & 
 Thoman, R. L. (2017). Surface air temperature. Arctic report card.
 
+World Bank. (1990–2013). CO2 emissions (metric tons per capita) [Dataset]. 
+https://data.worldbank.org/indicator/EN.ATM.CO2E.PC?view=chart
+
+World Bank. (1990–2013b). Energy use (kg of oil equivalent per capita) [Dataset]. 
+https://data.worldbank.org/indicator/EG.USE.PCAP.KG.OE?view=chart
+
+World Bank. (1990–2013c). Forest area (sq. km) [Dataset]. 
+https://data.worldbank.org/indicator/AG.LND.FRST.K2?view=chart
+
+World Bank. (1990–2013d). Population, total [Dataset]. 
+https://data.worldbank.org/indicator/SP.POP.TOTL?view=chart
+
+World Bank. (1990–2013e). Renewable energy consumption (% of total final energy consumption) [Dataset]. 
+https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS?view=chart
 
