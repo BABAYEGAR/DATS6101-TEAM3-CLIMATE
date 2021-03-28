@@ -358,11 +358,11 @@ corrplot(tempcor, method = "number", type="upper")
 
 #linear model ##Note: Model variables are selected based on variables closer to 1 and -1
 model1 <- lm(Temperature ~ Renew_Energy_Pct + Co2_Emissions + Forest_Area  + Population_Total, data=temp_data)
-#summary(model1)
+summary(model1)
 
 #rerun without population total
 model2 <- lm(Temperature ~ Renew_Energy_Pct + Energy_Use + Co2_Emissions + Forest_Area, data=temp_data)
-#summary(model2)
+summary(model2)
 
 faraway::vif(model2)
 ```
@@ -396,7 +396,7 @@ summary(africa_model)
 
 #faraway::vif(model1)
 ```
-* R Squared is `r format(summary(africa_model)$r.squared * 100)`% .
+For the Africa region, the following variables are significant at the 99% confidence level: renewable energy percentage and forest area. The variables found insignificant by the model was energy use and CO2 emissions. The R Squared is `r format(summary(africa_model)$r.squared * 100)`%.
 
 
 ### Regional Linear Regression for Americas Region
@@ -415,7 +415,7 @@ summary(americas_model)
 
 #faraway::vif(model1)
 ```
-* R Squared is `r format(summary(americas_model)$r.squared * 100)` % .
+For the Americas region, all variables are significant at the 99% confidence level. The R Squared is `r format(summary(americas_model)$r.squared * 100)` % .
 
 
 ### Regional Linear Regression for Asia Region
@@ -433,7 +433,7 @@ summary(asia_model)
 
 #faraway::vif(model1)
 ```
-* R Squared is `r format(summary(asia_model)$r.squared * 100)`% .
+For the Asia region, all variables are significant at the 99% confidence level. The R Squared is `r format(summary(asia_model)$r.squared * 100)`% .
 
 ### Regional Linear Regression for Europe Region
 ```{r step11, include=T, warning=F}
@@ -450,7 +450,7 @@ summary(europe_model)
 
 #faraway::vif(model1)
 ```
-* R Squared is `r format(summary(europe_model)$r.squared * 100)`% .
+For the Europe region, the following variables are significant at the 99% confidence level: renewable energy percentage and CO2 emissions. The variables found insignificant by the model was energy use and forest area. The R Squared is `r format(summary(europe_model)$r.squared * 100)`% .
 
 ### Regional Linear Regression for Oceania Region
 ```{r step12, include=T, warning=F}
@@ -467,7 +467,7 @@ summary(oceania_model)
 
 #faraway::vif(model1)
 ```
-* R Squared is `r format(summary(oceania_model)$r.squared * 100)`% .
+For the Oceania region, the following variables are significant at the 99% confidence level: renewable energy percentage, energy use, and CO2 emissions. Forest area is significant at the 95% confidence level. The R Squared is `r format(summary(oceania_model)$r.squared * 100)`% .
 
 # 3. Conclusions
 
