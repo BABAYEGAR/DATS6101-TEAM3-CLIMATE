@@ -219,7 +219,7 @@ The histogram of global average surface temperature from 1743 to 2013 yielded ex
 ### 4.2B Q-Q Plot
 The Q-Q plot for average surface temperature supported the conclusions drawn by the histogram, as it also suggested a left skewed distribution, with values peaking towards the middle left of the graph.
 
-## 4.3 Decadal and Centural Temperatures
+## 4.3 Centural Temperatures
 ```{r step3, include=T, warning=F}
 global_temps <-  na.omit(global_temps)
 global_temps$Century <- as.factor(global_temps$Century)
