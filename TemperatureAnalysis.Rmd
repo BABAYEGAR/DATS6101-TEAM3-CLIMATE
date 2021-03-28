@@ -1,6 +1,6 @@
 ---
-title: "Global Temperature Trends"
-author: "Group 3"
+title: "Climate Change: Analyzing Earth Surface Temperature Data"
+author: "Team 3: Sonia Clemens, Salim Haruna, Lauren Korlewitz, and Anna Zhu"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -140,33 +140,37 @@ xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", b
 
 
 # 1. Introduction
-Motivation
+
+##Motivation and Research Objectives
 
 Climate change is one of the most widely researched and heavily debated topics of the 21st century, as it not only impacts human systems and the biosphere, but also the hydrosphere, cryosphere, and lithosphere.   
 
-In the past decade alone, carbon dioxide concentrations have risen above 400 parts per million (ppm) for the first time in recorded history (Mikhaylov et al., 2020).  Rising land temperatures as well as increased frequency of natural disasters (drought, wildfires, flooding, etc,) are reflective of these changes in atmospheric carbon dioxide concentrations.  Furthermore, some regions,   such as the Arctic, are disproportionately affected by climate change, with mean land surface temperatures warming at twice the global rate in that region (Overland et al., 2017).
+In the past decade alone, carbon dioxide concentrations have risen above 400 parts per million (ppm) for the first time in recorded history (Mikhaylov et al., 2020).  Rising land temperatures as well as increased frequency of natural disasters (drought, wildfires, flooding, etc,) are reflective of these changes in atmospheric carbon dioxide concentrations.  Furthermore, some regions, such as the Arctic, are disproportionately affected by climate change, with mean land surface temperatures warming at twice the global rate in that region (Overland et al., 2017).
 
-While this topic has been extensively researched, many climate change studies are focused on specific climate feedbacks such as permafrost thaw or Arctic sea ice decline. To add to the already expansive framework of climate change, our group saw an opportunity to provide a more broad analysis of temperature change on a global scale over the past two centuries.
+While this topic has been extensively researched, many climate change studies are focused on specific climate feedbacks such as permafrost thaw or Arctic sea ice decline. To add to the already expansive framework of climate change, this project seeks to provide a more broad analysis of temperature change on a global scale over the past two centuries.
 
-Datasets and Dataset Limitations
+Based on the research goals and the scope of the datasets, the Specific, Measurable, Achievable, Realistic, and Timely (SMART) questions for the project are as follows:
+
+1. Are surface temperatures changing over time?
+2. What factors impact surface temperatures?
+
+##Brief Summary of Methodology
+
+To answer the first SMART question, a combination of boxplots, histograms, and line graphs were used. Upon preliminary testing, it was found that decadal temperature changes were too similar to show any distinct differences.  Instead, a centurial time scale was used.  A two-sample t-test and an ANOVA were used to identify if average temperatures were different in the 1990s and 2000s and if surface temperatures were different across regions respectively. 
+
+For the second SMART question, a linear model was constructed using the following variables: forest area, renewable energy percentage, population totals, energy use, CO2 emissions, and temperatures to predict surface temperatures. 
+
+##Dataset Information
 
 This project will explore regional and global records of temperature using open source earth surface temperature data from Kaggle and the World Bank. 
 
-Our first dataset is sourced from Kaggle and contains average surface temperature by country from 1743 to 2013. This dataset consists of more than 544,811 observations and contains four variables: year, average temperature, average temperature uncertainty, and the country in which these  temperatures were recorded.
+The first dataset from Kaggle contains average surface temperature by country from 1743 to 2013. This dataset consists of more than 544,811 observations and contains four variables: year, average temperature, average temperature uncertainty, and the country in which these  temperatures were recorded.  Using this dataset, regional and global temperature trends were explored. 
 
-Our second dataset is sourced from the World Bank and contains data points by country from 1990 to 2013. This dataset consists of 6,336 observations for each of the following categories: CO2 emissions, renewable energy consumptions (%), population total, energy use, and forest area.
-
-The expansive nature of the datasets presented several limitations for our analysis. With values ranging from 1743 at the earliest to present times at the latest, the surface temperature dataset specifically needed cleaning up and sorting before it could be used for proper exploratory data analysis (EDA).
-
-The first step in rendering the data usable to answer our SMART questions was to create three new variables within the surface temperature data set, including region, century, and decade. Afterwards, the century and decade variables were converted into factor format so as to allow our temperatures to be grouped into certain time periods. The final step in formatting this dataset was to drop our missing values. In a dataset ranging from 1743 to present, there were many missing values that can be traced to a lack of substantial population. For example, many values prior to the 1800s in South America were noticeably void as the region had not yet been colonized. 
-
-In the World Bank data sets, there were not as many missing values or formatting issues that needed to be resolved, although the data did require reformatting to be used for our intended purposes. For this project, the categories of CO2 emissions, renewable energy consumptions (%), population total, energy use, and forest area were to be used as predictor variables in our model. To enable EDA using this dataset, the data sets were formatted from wide to long form so that each row would count as a singular observation. Afterwards, data outside of the 1990 to 2013 range was dropped to allow the five variables to be merged together for cleaner processing of the predictor variables in our model. Because some data such as renewable energy use were not measured until the 1990s, this time range was chosen to ensure consistency within our analysis.
-
-
+The second dataset is sourced from the World Bank and contains data points by country from 1990 to 2013. This dataset consists of 6,336 observations for each of the following categories: CO2 emissions, renewable energy consumptions (%), population total, energy use, and forest area.  This dataset provides data on the potential predictor variables of surface temperature. 
 
 # 2. Exploratory Data Analysis
 
-### Import the data
+### Import the Data
 ```{r step1, include=T, warning=F}
 global_temps <- data.frame(read_csv("Datasets/GlobalTemp.csv"))
 global_temps$Region <- countrycode(sourcevar = global_temps[, "Country"],origin = "country.name",destination = "continent")
@@ -176,7 +180,7 @@ global_temps$Decade <- (global_temps$Year - global_temps$Year %% 10)
 global_temps$Century <- (global_temps$Year - global_temps$Year %% 100)
 ```
 
-### Analyze temperature data with qq-plot and histogram
+### Analyze Temperature Data with Q-Q Plot and Histogram
 ```{r step2, include=T, warning=F}
 temp_histogram <- ggplot(global_temps, aes(x=AverageTemperature)) +
   geom_histogram(color="dark blue", fill= "lightblue") +
@@ -192,9 +196,13 @@ summary(global_temps)
 sd(global_temps$AverageTemperature)
 ```
 
+### Results of Histogram and Q-Q Plot
 
+#### Histogram
+The histogram of global average surface temperature from 1743 to 2013 yielded expected results, with a mean of 17.2 on an overall left skewed distribution. This histogram allowed further analysis since it confirmed that global temperatures fall into an average level of approximately 17 degrees C or 63 degress F. A value too high or too low would require reassessment of the dataset, since humans require livable temperatures.
 
-
+#### Q-Q Plot
+The Q-Q plot for average surface temperature supported the conclusions drawn by the histogram, as it also suggested a left skewed distribution, with values peaking towards the middle left of the graph.
 
 ### Analyze global trends by decade and century with lineplot and boxplot
 ```{r step3, include=T, warning=F}
@@ -437,5 +445,13 @@ summary(oceania_model)
 
 # 4. References
 
+Luyssaert, S., Schulze, E. D., Börner, A., Knohl, A., Hessenmöller, D., Law, B. E., ... & Grace, J. 
+(2008). Old-growth forests as global carbon sinks. Nature, 455(7210), 213-215.
+
+Mikhaylov, A., Moiseev, N., Aleshin, K., & Burkhardt, T. (2020). Global climate change and 
+greenhouse effect. Entrepreneurship and Sustainability Issues, 7(4), 2897.
+ 
+Overland, J. E., Hanna, E., Hanssen-Bauer, I., Kim, S. J., Walsh, J. E., Wang, M., Bhatt, U.S., & 
+Thoman, R. L. (2017). Surface air temperature. Arctic report card.
 
 
