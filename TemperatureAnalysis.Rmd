@@ -141,7 +141,7 @@ xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", b
 
 # 1. Introduction
 
-##Motivation and Research Objectives
+## Motivation and Research Objectives
 
 Climate change is one of the most widely researched and heavily debated topics of the 21st century, as it not only impacts human systems and the biosphere, but also the hydrosphere, cryosphere, and lithosphere.   
 
@@ -154,13 +154,13 @@ Based on the research goals and the scope of the datasets, the Specific, Measura
 1. Are surface temperatures changing over time?
 2. What factors impact surface temperatures?
 
-##Brief Summary of Methodology
+## Brief Summary of Methodology
 
 To answer the first SMART question, a combination of boxplots, histograms, and line graphs were used. Upon preliminary testing, it was found that decadal temperature changes were too similar to show any distinct differences.  Instead, a centurial time scale was used.  A two-sample t-test and an ANOVA were used to identify if average temperatures were different in the 1990s and 2000s and if surface temperatures were different across regions respectively. 
 
 For the second SMART question, a linear model was constructed using the following variables: forest area, renewable energy percentage, population totals, energy use, CO2 emissions, and temperatures to predict surface temperatures. 
 
-##Dataset Information
+## Dataset Information
 
 This project will explore regional and global records of temperature using open source earth surface temperature data from Kaggle and the World Bank. 
 
@@ -168,7 +168,6 @@ The first dataset from Kaggle contains average surface temperature by country fr
 
 The second dataset is sourced from the World Bank and contains data points by country from 1990 to 2013. This dataset consists of 6,336 observations for each of the following categories: CO2 emissions, renewable energy consumption (%), population total, energy use, and forest area.  This dataset provides data on the potential predictor variables of surface temperature.
 
-##Dataset Cleaning
 
 The expansive nature of the datasets presented several limitations for analysis. With values ranging from 1743 at the earliest to present times at the latest, the surface temperature dataset specifically needed cleaning and sorting before it could be used for proper exploratory data analysis (EDA) (see "Data Cleaning for Linear Regression").
 
