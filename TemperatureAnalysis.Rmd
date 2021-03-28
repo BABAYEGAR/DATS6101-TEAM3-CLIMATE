@@ -415,7 +415,7 @@ summary(oceania_model)
 
 # 3. Conclusions
 
-# 4. Bibliography
+# 4. References
 
 
 
