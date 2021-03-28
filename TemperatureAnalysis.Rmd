@@ -140,7 +140,27 @@ xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", b
 
 
 # 1. Introduction
+Motivation
 
+Climate change is one of the most widely researched and heavily debated topics of the 21st century, as it not only impacts human systems and the biosphere, but also the hydrosphere, cryosphere, and lithosphere.   
+
+In the past decade alone, carbon dioxide concentrations have risen above 400 parts per million (ppm) for the first time in recorded history (Mikhaylov et al., 2020).  Rising land temperatures as well as increased frequency of natural disasters (drought, wildfires, flooding, etc,) are reflective of these changes in atmospheric carbon dioxide concentrations.  Furthermore, some regions,   such as the Arctic, are disproportionately affected by climate change, with mean land surface temperatures warming at twice the global rate in that region (Overland et al., 2017).
+
+While this topic has been extensively researched, many climate change studies are focused on specific climate feedbacks such as permafrost thaw or Arctic sea ice decline. To add to the already expansive framework of climate change, our group saw an opportunity to provide a more broad analysis of temperature change on a global scale over the past two centuries.
+
+Datasets and Dataset Limitations
+
+This project will explore regional and global records of temperature using open source earth surface temperature data from Kaggle and the World Bank. 
+
+Our first dataset is sourced from Kaggle and contains average surface temperature by country from 1743 to 2013. This dataset consists of more than 544,811 observations and contains four variables: year, average temperature, average temperature uncertainty, and the country in which these  temperatures were recorded.
+
+Our second dataset is sourced from the World Bank and contains data points by country from 1990 to 2013. This dataset consists of 6,336 observations for each of the following categories: CO2 emissions, renewable energy consumptions (%), population total, energy use, and forest area.
+
+The expansive nature of the datasets presented several limitations for our analysis. With values ranging from 1743 at the earliest to present times at the latest, the surface temperature dataset specifically needed cleaning up and sorting before it could be used for proper exploratory data analysis (EDA).
+
+The first step in rendering the data usable to answer our SMART questions was to create three new variables within the surface temperature data set, including region, century, and decade. Afterwards, the century and decade variables were converted into factor format so as to allow our temperatures to be grouped into certain time periods. The final step in formatting this dataset was to drop our missing values. In a dataset ranging from 1743 to present, there were many missing values that can be traced to a lack of substantial population. For example, many values prior to the 1800s in South America were noticeably void as the region had not yet been colonized. 
+
+In the World Bank data sets, there were not as many missing values or formatting issues that needed to be resolved, although the data did require reformatting to be used for our intended purposes. For this project, the categories of CO2 emissions, renewable energy consumptions (%), population total, energy use, and forest area were to be used as predictor variables in our model. To enable EDA using this dataset, the data sets were formatted from wide to long form so that each row would count as a singular observation. Afterwards, data outside of the 1990 to 2013 range was dropped to allow the five variables to be merged together for cleaner processing of the predictor variables in our model. Because some data such as renewable energy use were not measured until the 1990s, this time range was chosen to ensure consistency within our analysis.
 
 
 
