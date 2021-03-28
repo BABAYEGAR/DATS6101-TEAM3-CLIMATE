@@ -1619,19 +1619,19 @@ div.tocify {
 <div id="introduction" class="section level1">
 <h1>1. Introduction</h1>
 <div id="motivation-and-research-objectives" class="section level3">
-<h3>Motivation and Research Objectives</h3>
+<h3>1.1 Motivation and Research Objectives</h3>
 <p>Climate change is one of the most widely researched and heavily debated topics of the 21st century, as it not only impacts human systems and the biosphere, but also the hydrosphere, cryosphere, and lithosphere.</p>
 <p>In the past decade alone, carbon dioxide concentrations have risen above 400 parts per million (ppm) for the first time in recorded history (Mikhaylov et al., 2020). Rising land temperatures as well as increased frequency of natural disasters (drought, wildfires, flooding, etc,) are reflective of these changes in atmospheric carbon dioxide concentrations. Furthermore, some regions, such as the Arctic, are disproportionately affected by climate change, with mean land surface temperatures warming at twice the global rate in that region (Overland et al., 2017).</p>
 </div>
 <div id="previous-research" class="section level3">
-<h3>Previous Research</h3>
+<h3>1.1 Previous Research</h3>
 <p>While this topic has been extensively researched, many climate change studies are focused on specific climate feedback such as permafrost thaw or Arctic sea ice decline. To add to the already expansive framework of climate change, this project seeks to provide a more broad analysis of temperature change on a global scale over the past two centuries.</p>
 </div>
 </div>
 <div id="datasets" class="section level1">
 <h1>2. Datasets</h1>
 <div id="origin" class="section level3">
-<h3>Origin</h3>
+<h3>2.1 Origin</h3>
 <p>To answer the first SMART question, a combination of boxplots, histograms, and line graphs were used. Upon preliminary testing, it was found that decadal temperature changes were too similar to show any distinct differences. Instead, a centurial time scale was used. A two-sample t-test and an ANOVA were used to identify if average temperatures were different in the 1990s and 2000s and if surface temperatures were different across regions respectively.</p>
 <p>For the second SMART question, a linear model was constructed using the following variables: forest area, renewable energy percentage, population totals, energy use, CO2 emissions, and temperatures to predict surface temperatures.</p>
 <p>This project will explore regional and global records of temperature using open source earth surface temperature data from Kaggle and the World Bank.</p>
@@ -1639,7 +1639,7 @@ div.tocify {
 <p>The second dataset is sourced from the World Bank and contains data points by country from 1990 to 2013. This dataset consists of 6,336 observations for each of the following categories: CO2 emissions, renewable energy consumption (%), population total, energy use, and forest area. This dataset provides data on the potential predictor variables of surface temperature.</p>
 </div>
 <div id="limitations" class="section level3">
-<h3>Limitations</h3>
+<h3>2.2 Limitations</h3>
 <p>The expansive nature of the datasets presented several limitations for analysis. With values ranging from 1743 at the earliest to present times at the latest, the surface temperature dataset specifically needed cleaning and sorting before it could be used for proper exploratory data analysis (EDA) (see “Data Cleaning for Linear Regression”).</p>
 <p>First, three new variables were created within the surface temperature data set from Kaggle, including region, century, and decade. Afterwards, the century and decade variables were converted into factor format to allow temperatures to be grouped into certain time periods. The final step in formatting this dataset was to drop missing values. There were many missing values over the long study period that can be traced to a lack of substantial population. For example, many values prior to the 1800s in South America were noticeably void as the region had not yet been colonized.</p>
 <p>In the World Bank datasets, there were not as many missing values or formatting issues that needed to be resolved, although the data did require reformatting to be used for this project. The categories of CO2 emissions, renewable energy consumption (%), population total, energy use, and forest area were used as predictor variables in the linear model. To enable EDA using this dataset, the datasets were formatted from wide to long form so that each row would count as a singular observation. Afterwards, data outside of the 1990 to 2013 range was dropped to allow the five variables to be merged together for cleaner processing of the predictor variables in the model. Because some data such as renewable energy use were not measured until the 1990s, this time range was chosen to ensure consistency for the analysis.</p>
@@ -1658,7 +1658,7 @@ div.tocify {
 <div id="exploratory-data-analysis" class="section level1">
 <h1>4. Exploratory Data Analysis</h1>
 <div id="import-the-data" class="section level2">
-<h2>Import the Data</h2>
+<h2>4.1 Import the Data</h2>
 <pre class="r"><code>global_temps &lt;- data.frame(read_csv(&quot;Datasets/GlobalTemp.csv&quot;))
 global_temps$Region &lt;- countrycode(sourcevar = global_temps[, &quot;Country&quot;],origin = &quot;country.name&quot;,destination = &quot;continent&quot;)
 names(global_temps)[1] &lt;- &#39;Year&#39;
@@ -1667,7 +1667,7 @@ global_temps$Decade &lt;- (global_temps$Year - global_temps$Year %% 10)
 global_temps$Century &lt;- (global_temps$Year - global_temps$Year %% 100)</code></pre>
 </div>
 <div id="global-temperatures" class="section level2">
-<h2>Global Temperatures</h2>
+<h2>4.2 Global Temperatures</h2>
 <pre class="r"><code>temp_histogram &lt;- ggplot(global_temps, aes(x=AverageTemperature)) +
   geom_histogram(color=&quot;dark blue&quot;, fill= &quot;lightblue&quot;) +
   labs(title =&quot;Histogram of Global Average Surface Temperature&quot;, subtitle=&quot;1743 - 2013&quot;) +
@@ -1681,17 +1681,17 @@ temp_histogram</code></pre>
 
 summary(global_temps)
 sd(global_temps$AverageTemperature)</code></pre>
-<div id="histogram" class="section level3">
-<h3>Histogram</h3>
+<div id="a-histogram" class="section level3">
+<h3>4.2A Histogram</h3>
 <p>The histogram of global average surface temperature from 1743 to 2013 yielded expected results, with a mean of 17.2 on an overall left skewed distribution. This histogram allowed further analysis since it confirmed that global temperatures fall into an average level of approximately 17 degrees C or 63 degrees F. A value too high or too low would require reassessment of the dataset, since humans require livable temperatures.</p>
 </div>
-<div id="q-q-plot" class="section level3">
-<h3>Q-Q Plot</h3>
+<div id="b-q-q-plot" class="section level3">
+<h3>4.2B Q-Q Plot</h3>
 <p>The Q-Q plot for average surface temperature supported the conclusions drawn by the histogram, as it also suggested a left skewed distribution, with values peaking towards the middle left of the graph.</p>
 </div>
 </div>
 <div id="decadal-and-centural-temperatures" class="section level2">
-<h2>Decadal and Centural Temperatures</h2>
+<h2>4.3 Decadal and Centural Temperatures</h2>
 <pre class="r"><code>global_temps &lt;-  na.omit(global_temps)
 global_temps$Century &lt;- as.factor(global_temps$Century)
 global_temps$Decade &lt;- as.factor(global_temps$Decade)
@@ -1722,7 +1722,7 @@ century_year_temp_data_boxplot</code></pre>
 </div>
 </div>
 <div id="regional-temperature" class="section level2">
-<h2>Regional Temperature</h2>
+<h2>4.4 Regional Temperature</h2>
 <pre class="r"><code>global_temps &lt;-  na.omit(global_temps)
 regional_year_temp_data &lt;-  global_temps %&gt;% group_by(Region, Year) %&gt;% 
 summarize(mean(AverageTemperature))
@@ -1751,20 +1751,20 @@ print(regional_year_temp_data_line_plot)</code></pre>
 <div id="hypothesis-testing" class="section level1">
 <h1>5. Hypothesis Testing</h1>
 <div id="anova-test---do-temperatures-vary-by-region" class="section level3">
-<h3>Anova Test - Do Temperatures Vary by Region?</h3>
+<h3>5.1 Anova Test - Do Temperatures Vary by Region?</h3>
 <pre class="r"><code>reginal_aov = aov(`mean(AverageTemperature)` ~ Region, data = regional_year_temp_data)
 reginal_aov_summary = summary(reginal_aov)
 xkabledply(reginal_aov_summary)</code></pre>
 </div>
 <div id="t-test---are-1900s-and-2000s-statistically-different" class="section level3">
-<h3>t-test - Are 1900s and 2000s statistically different?</h3>
+<h3>5.2 t-test - Are 1900s and 2000s statistically different?</h3>
 <pre class="r"><code>global_temps_1900s &lt;- subset(global_temps, global_temps$Century == &quot;1900&quot;)
 global_temps_2000s &lt;- subset(global_temps, global_temps$Century == &quot;2000&quot;)
 century_ttest &lt;- t.test(global_temps_1900s$AverageTemperature, global_temps_2000s$AverageTemperature, alternative = &quot;greater&quot;, conf.level = 0.95)
 century_ttest</code></pre>
 </div>
 <div id="results-of-hypothesis-testing" class="section level3">
-<h3>Results of Hypothesis Testing</h3>
+<h3>5.3 Results of Hypothesis Testing</h3>
 <ul>
 <li><p>The ANOVA test identified if the surface temperatures were different across regions. The results show that surface temperatures are different across the regions, as the p-value is [2.28e-269, NA] and the F-value is [NULL]. Due to the very high F value and very low p-value, we reject the null hypothesis and infer that the temperature across regions are different.</p></li>
 <li><p>Using a two-sample t-test, differences between average surface temperatures in the 1900s and 2000s were analyzed. The two-sample t-test yielded a p-value of [1]. Due to the very low p-value, the null hypothesis is rejected implying that the temperature in 1900s and 2000s are slightly different in that there is a slight increase from 1900s to 2000s.</p></li>
@@ -1774,7 +1774,7 @@ century_ttest</code></pre>
 <div id="model-building" class="section level1">
 <h1>6. Model Building</h1>
 <div id="data-cleaning-for-linear-regression" class="section level2">
-<h2>Data Cleaning for Linear Regression</h2>
+<h2>6.1 Data Cleaning for Linear Regression</h2>
 <pre class="r"><code>#format dataset to single observation by country per year
 summary_temp_data &lt;-  global_temps %&gt;% group_by(Year, Country) %&gt;% 
 summarize(mean(AverageTemperature))
@@ -1825,7 +1825,7 @@ colnames(summary_temp_data) &lt;- c(&quot;Year&quot;, &quot;Country&quot;, &quot
 temp_data &lt;- merge(climate_change, summary_temp_data, by=c(&quot;Country&quot;, &quot;Year&quot;))</code></pre>
 </div>
 <div id="linear-regression" class="section level2">
-<h2>Linear Regression</h2>
+<h2>6.2 Linear Regression</h2>
 <pre class="r"><code>#correlation plot
 #remove categorical variables for plot
 temp_data_cor &lt;- subset(temp_data, select=-c(1,2))
@@ -1844,7 +1844,7 @@ summary(model2)
 faraway::vif(model2)</code></pre>
 </div>
 <div id="model-building-and-results" class="section level2">
-<h2>Model Building and Results</h2>
+<h2>6.3 Model Building and Results</h2>
 <p>To begin model building, correlation between all numerical variables (forest area, renewable energy percentage, population totals, energy use, CO2 emissions, and temperatures) were examined using a correlation matrix. Based on this plot matrix, all variables could be included in the model. However, it is necessary to consider the correlations between energy usage and CO2 in reality, as environments with higher energy usage tend to have higher CO2 outputs that can cause a rise in temperature as seen in the U.S., China, and India.</p>
 <p>The following variables are significant at the 99% confidence level: renewable energy percentage, energy use, CO2 emissions and forest area. The only variable found insignificant by the model was population total.</p>
 <p>The model was revised to include only the statistically significant variables mentioned above, omitting the population total variable. At the 99% confidence level, renewable energy percentage, energy use, CO2 emissions and forest area were found to be statistically significant. A check of the VIF values for the revised model indicated possible multicollinearity as energy use and CO2 emissions returned values over 5. The values, however, were not deemed high enough to remove them from the model.</p>
@@ -1852,9 +1852,9 @@ faraway::vif(model2)</code></pre>
 <p>Where the variable units for renewable energy percent resulted from the percentage of total energy usage and energy use equals kilogram of oil equivalent per capita. CO2 emissions are reported in metric tons per capita and forest area in square kilometers. The R Squared for the revised model is 21.8% .</p>
 </div>
 <div id="regional-linear-regression" class="section level2">
-<h2>Regional Linear Regression</h2>
-<div id="africa" class="section level3">
-<h3>Africa</h3>
+<h2>6.4 Regional Linear Regression</h2>
+<div id="a-africa" class="section level3">
+<h3>6.4A Africa</h3>
 <pre class="r"><code>#correlation plot
 #remove categorical variables for plot
 temp_data$Region &lt;- countrycode(sourcevar = temp_data[, &quot;Country&quot;],origin = &quot;country.name&quot;,destination = &quot;continent&quot;)
@@ -1868,8 +1868,8 @@ africa_model &lt;- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions
 summary(africa_model)</code></pre>
 <p>For the Africa region, the following variables are significant at the 99% confidence level: renewable energy percentage and forest area. The variables found insignificant by the model was energy use and CO2 emissions. The R Squared is 34.5%.</p>
 </div>
-<div id="americas" class="section level3">
-<h3>Americas</h3>
+<div id="b-americas" class="section level3">
+<h3>6.4B Americas</h3>
 <pre class="r"><code>#correlation plot
 #remove categorical variables for plot
 temp_data$Region &lt;- countrycode(sourcevar = temp_data[, &quot;Country&quot;],origin = &quot;country.name&quot;,destination = &quot;continent&quot;)
@@ -1884,8 +1884,8 @@ americas_model &lt;- lm(Temperature ~ Energy_Use + Renew_Energy_Pct + Co2_Emissi
 summary(americas_model)</code></pre>
 <p>For the Americas region, all variables are significant at the 99% confidence level. The R Squared is 76.1 % .</p>
 </div>
-<div id="asia" class="section level3">
-<h3>Asia</h3>
+<div id="c-asia" class="section level3">
+<h3>6.4C Asia</h3>
 <pre class="r"><code>#correlation plot
 #remove categorical variables for plot
 temp_data$Region &lt;- countrycode(sourcevar = temp_data[, &quot;Country&quot;],origin = &quot;country.name&quot;,destination = &quot;continent&quot;)
@@ -1899,8 +1899,8 @@ asia_model &lt;- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions +
 summary(asia_model)</code></pre>
 <p>For the Asia region, all variables are significant at the 99% confidence level. The R Squared is 18.2% .</p>
 </div>
-<div id="europe" class="section level3">
-<h3>Europe</h3>
+<div id="d-europe" class="section level3">
+<h3>6.4D Europe</h3>
 <pre class="r"><code>#correlation plot
 #remove categorical variables for plot
 temp_data$Region &lt;- countrycode(sourcevar = temp_data[, &quot;Country&quot;],origin = &quot;country.name&quot;,destination = &quot;continent&quot;)
@@ -1914,8 +1914,8 @@ europe_model &lt;- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions
 summary(europe_model)</code></pre>
 <p>For the Europe region, the following variables are significant at the 99% confidence level: renewable energy percentage and CO2 emissions. The variables found insignificant by the model was energy use and forest area. The R Squared is 18.8% .</p>
 </div>
-<div id="oceania" class="section level3">
-<h3>Oceania</h3>
+<div id="e-oceania" class="section level3">
+<h3>6.4E Oceania</h3>
 <pre class="r"><code>#correlation plot
 #remove categorical variables for plot
 temp_data$Region &lt;- countrycode(sourcevar = temp_data[, &quot;Country&quot;],origin = &quot;country.name&quot;,destination = &quot;continent&quot;)
@@ -1934,18 +1934,18 @@ summary(oceania_model)</code></pre>
 <div id="conclusion" class="section level1">
 <h1>7. Conclusion</h1>
 <div id="question-1" class="section level2">
-<h2>Question 1</h2>
-<div id="are-surface-temperatures-changing-over-time" class="section level3">
-<h3>Are surface temperatures changing over time?</h3>
+<h2>7.1 Question 1</h2>
+<div id="a-are-surface-temperatures-changing-over-time" class="section level3">
+<h3>7.1A Are surface temperatures changing over time?</h3>
 <p>From the boxplot, the Americas region has the highest interquartile range. This makes it the region with the most changed temperature level.</p>
 <p>Highest mean surface temperatures were found in Oceania and Africa, followed by the Americas and Asia, with the coldest mean temperatures occurring in Europe</p>
 <p>For all regions previously stated in the boxplot analysis, there were noticeable temperature increases most notably beginning in the early-to-mid 1800s. Even Oceania, for which the boxplot analysis showed to have some of the highest temperatures among all regions, temperatures increased throughout the mid 1800s to 2000s. The most dramatic rates of temperature increase were observed in the Americas and Asia. For other regions such as Europe, temperatures steadily increased albeit at a slower rate.</p>
 </div>
 </div>
 <div id="question-2" class="section level2">
-<h2>Question 2:</h2>
-<div id="what-factors-impact-surface-temperatures" class="section level3">
-<h3>What factors impact surface temperatures?</h3>
+<h2>7.2 Question 2</h2>
+<div id="a-what-factors-impact-surface-temperatures" class="section level3">
+<h3>7.2A What factors impact surface temperatures?</h3>
 <p>According to the equation, the most influential factor in surface temperature increase is CO2 emissions, which contributes the most to temperature rise. Renewable energy percentage was also found to have a minimal contribution to surface temperature rise, while energy use was found to detract from surface temperature increase. Forested area was also linked to decreases in surface temperature by the revised model and this is consistent with studies that indicate forests to be carbon sinks (Luyssaert et al., 2008).</p>
 </div>
 </div>
