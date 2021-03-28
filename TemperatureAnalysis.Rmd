@@ -141,10 +141,17 @@ xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", b
 
 # 1. Introduction
 
+# 2. Previous Research
+
+# 3. Datasets
+
+###  Datasets Limitations
+
+# 3. SMART Questions
 
 
 
-# 2. Exploratory Data Analysis
+# 4. Exploratory Data Analysis
 
 ### Import the data
 ```{r step1, include=T, warning=F}
@@ -156,7 +163,7 @@ global_temps$Decade <- (global_temps$Year - global_temps$Year %% 10)
 global_temps$Century <- (global_temps$Year - global_temps$Year %% 100)
 ```
 
-### Analyze temperature data with qq-plot and histogram
+### Analyze Global Temperatures
 ```{r step2, include=T, warning=F}
 temp_histogram <- ggplot(global_temps, aes(x=AverageTemperature)) +
   geom_histogram(color="dark blue", fill= "lightblue") +
@@ -176,7 +183,7 @@ sd(global_temps$AverageTemperature)
 
 
 
-### Analyze global trends by decade and century with lineplot and boxplot
+### Analyze Decadal and Centural Temperatures
 ```{r step3, include=T, warning=F}
 global_temps <-  na.omit(global_temps)
 global_temps$Century <- as.factor(global_temps$Century)
@@ -205,7 +212,7 @@ century_year_temp_data_boxplot
   
 ```
 
-### Analyze Global Temperature by regions with lineplot and boxplot
+### Analyze Regional Temperature
 ```{r step4, include=T, warning=F}
 global_temps <-  na.omit(global_temps)
 regional_year_temp_data <-  global_temps %>% group_by(Region, Year) %>% 
@@ -224,31 +231,36 @@ regional_year_temp_data_boxplot <- ggplot(regional_year_temp_data, aes(x=as.fact
 print(regional_year_temp_data_line_plot)
 print(regional_year_temp_data_boxplot)
 
+```
+* From the boxplot, Americas region has the highest interquartile range. This makes its the region with the most changed temperature level.
+
+# 5. Effects of EDA
+
+
+# 6. Hypothesis Testing
+
+### Do Temperatures Vary by Region?
+```{r step 5A, include=T, warning=F}
 reginal_aov = aov(`mean(AverageTemperature)` ~ Region, data = regional_year_temp_data)
 reginal_aov_summary = summary(reginal_aov)
 xkabledply(reginal_aov_summary)
-
-
 ```
-* From the boxplot, Americas region has the highest interquartile range. This makes its the regin with the most changed tempreature level.
 * The p-value is [`r format(summary(reginal_aov)[[1]][["Pr(>F)"]])`] .
 * The F-value is [`r format(summary(reginal_aov)[[1]][["F Value"]])`] .
 * Due to the very high F value and very low p-value, we reject the null hypothesis and infer that the temperature across regions are different.
 
-
-### Hypothesis Tests
-```{r step 5, include=T, warning=F}
-#are 1900s and 2000s statistically different?
-
-#subset data
+### Are 1900s and 2000s statistically different?
+```{r step 5B, include=T, warning=F}
 global_temps_1900s <- subset(global_temps, global_temps$Century == "1900")
 global_temps_2000s <- subset(global_temps, global_temps$Century == "2000")
 century_ttest <- t.test(global_temps_1900s$AverageTemperature, global_temps_2000s$AverageTemperature, alternative = "greater", conf.level = 0.95)
-
+century_ttest
 ```
 * The p-value is [`r format(century_ttest$p.value)`] .
 * Due to the very low p-value, we reject the null hypothesis and infer that the temperature in 1900s and 2000s are slightly diffferent in that there is a slight increase from 1900s to 2000s..
 
+
+# 7. Model Building
 
 ### Data Cleaning for Linear Regression
 ```{r step6, include=T, warning=F}
@@ -324,7 +336,7 @@ faraway::vif(model2)
 ```
 * R Squared is `r format(summary(model2)$r.squared * 100)`% .
 
-### Regional Linear Regression for Africa Region
+### Linear Regression for Africa Region
 ```{r step8, include=T, warning=F}
 #correlation plot
 #remove categorical variables for plot
@@ -342,7 +354,7 @@ summary(africa_model)
 * R Squared is `r format(summary(africa_model)$r.squared * 100)`% .
 
 
-### Regional Linear Regression for Americas Region
+### Linear Regression for Americas Region
 ```{r step9, include=T, warning=F}
 #correlation plot
 #remove categorical variables for plot
@@ -361,7 +373,7 @@ summary(americas_model)
 * R Squared is `r format(summary(americas_model)$r.squared * 100)` % .
 
 
-### Regional Linear Regression for Asia Region
+### Linear Regression for Asia Region
 ```{r step10, include=T, warning=F}
 #correlation plot
 #remove categorical variables for plot
@@ -378,7 +390,7 @@ summary(asia_model)
 ```
 * R Squared is `r format(summary(asia_model)$r.squared * 100)`% .
 
-### Regional Linear Regression for Europe Region
+### Linear Regression for Europe Region
 ```{r step11, include=T, warning=F}
 #correlation plot
 #remove categorical variables for plot
@@ -396,7 +408,7 @@ summary(europe_model)
 * R Squared is `r format(summary(europe_model)$r.squared * 100)`% .
 
 
-### Regional Linear Regression for Oceania Region
+### Linear Regression for Oceania Region
 ```{r step12, include=T, warning=F}
 #correlation plot
 #remove categorical variables for plot
@@ -413,9 +425,11 @@ summary(oceania_model)
 ```
 * R Squared is `r format(summary(oceania_model)$r.squared * 100)`% .
 
-# 3. Conclusions
 
-# 4. Bibliography
+
+# 8. Conclusion
+
+# 9. Bibliography
 
 
 
