@@ -1632,8 +1632,6 @@ div.tocify {
 <h1>2. Datasets</h1>
 <div id="origin" class="section level3">
 <h3>2.1 Origin</h3>
-<p>To answer the first SMART question, a combination of boxplots, histograms, and line graphs were used. Upon preliminary testing, it was found that decadal temperature changes were too similar to show any distinct differences. Instead, a centurial time scale was used. A two-sample t-test and an ANOVA were used to identify if average temperatures were different in the 1990s and 2000s and if surface temperatures were different across regions respectively.</p>
-<p>For the second SMART question, a linear model was constructed using the following variables: forest area, renewable energy percentage, population totals, energy use, CO2 emissions, and temperatures to predict surface temperatures.</p>
 <p>This project will explore regional and global records of temperature using open source earth surface temperature data from Kaggle and the World Bank.</p>
 <p>The first dataset from Kaggle contains average surface temperature by country from 1743 to 2013. This dataset consists of more than 544,811 observations and contains four variables: year, average temperature, average temperature uncertainty, and the country in which these temperatures were recorded. Using this dataset, regional and global temperature trends were explored.</p>
 <p>The second dataset is sourced from the World Bank and contains data points by country from 1990 to 2013. This dataset consists of 6,336 observations for each of the following categories: CO2 emissions, renewable energy consumption (%), population total, energy use, and forest area. This dataset provides data on the potential predictor variables of surface temperature.</p>
@@ -1952,9 +1950,15 @@ summary(oceania_model)</code></pre>
 </div>
 <div id="bibliography" class="section level1">
 <h1>8. Bibliography</h1>
+<p>Kaggle. (1743–2013). Climate Change: Earth Surface Temperature Data [Dataset]. <a href="https://www.kaggle.com/berkeleyearth/climate-change-earth-surface-temperature-data" class="uri">https://www.kaggle.com/berkeleyearth/climate-change-earth-surface-temperature-data</a></p>
 <p>Luyssaert, S., Schulze, E. D., Börner, A., Knohl, A., Hessenmöller, D., Law, B. E., … &amp; Grace, J. (2008). Old-growth forests as global carbon sinks. Nature, 455(7210), 213-215.</p>
 <p>Mikhaylov, A., Moiseev, N., Aleshin, K., &amp; Burkhardt, T. (2020). Global climate change and greenhouse effect. Entrepreneurship and Sustainability Issues, 7(4), 2897.</p>
 <p>Overland, J. E., Hanna, E., Hanssen-Bauer, I., Kim, S. J., Walsh, J. E., Wang, M., Bhatt, U.S., &amp; Thoman, R. L. (2017). Surface air temperature. Arctic report card.</p>
+<p>World Bank. (1990–2013). CO2 emissions (metric tons per capita) [Dataset]. <a href="https://data.worldbank.org/indicator/EN.ATM.CO2E.PC?view=chart" class="uri">https://data.worldbank.org/indicator/EN.ATM.CO2E.PC?view=chart</a></p>
+<p>World Bank. (1990–2013b). Energy use (kg of oil equivalent per capita) [Dataset]. <a href="https://data.worldbank.org/indicator/EG.USE.PCAP.KG.OE?view=chart" class="uri">https://data.worldbank.org/indicator/EG.USE.PCAP.KG.OE?view=chart</a></p>
+<p>World Bank. (1990–2013c). Forest area (sq. km) [Dataset]. <a href="https://data.worldbank.org/indicator/AG.LND.FRST.K2?view=chart" class="uri">https://data.worldbank.org/indicator/AG.LND.FRST.K2?view=chart</a></p>
+<p>World Bank. (1990–2013d). Population, total [Dataset]. <a href="https://data.worldbank.org/indicator/SP.POP.TOTL?view=chart" class="uri">https://data.worldbank.org/indicator/SP.POP.TOTL?view=chart</a></p>
+<p>World Bank. (1990–2013e). Renewable energy consumption (% of total final energy consumption) [Dataset]. <a href="https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS?view=chart" class="uri">https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS?view=chart</a></p>
 </div>
 
 
