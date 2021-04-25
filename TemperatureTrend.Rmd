@@ -284,6 +284,69 @@ summary(model2)
 
 faraway::vif(model2)
 ```
+
+###Pull Additional Indicators for Feature Selection
+```{r}
+#electricity access (% of population)
+electricity <- data.frame(read_xls("Datasets/electricity.xls"))
+electricity <- subset(electricity, select = -c(2:34))
+electricity <- subset(electricity, select = -c(26:32))
+colnames(electricity) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999",
+                           "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010",
+                           "2011", "2012", "2013")
+electricity_long <- gather(electricity, Year, Electricity_Access, 2:25, factor_key=TRUE)
+
+#annual freshwater withdrawals
+water <- data.frame(read_xls("Datasets/water.xls"))
+water <- subset(water, select = -c(2:34))
+water <- subset(water, select = -c(26:32))
+colnames(water) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999",
+                           "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010",
+                           "2011", "2012", "2013")
+water_long <- gather(water, Year, Water_withdrawal, 2:25, factor_key=TRUE)
+
+#pollution explosure
+pollution <- data.frame(read_xls("Datasets/pollution.xls"))
+pollution <- subset(pollution, select = -c(2:34))
+pollution <- subset(pollution, select = -c(26:32))
+colnames(pollution) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999",
+                           "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010",
+                           "2011", "2012", "2013")
+pollution_long <- gather(pollution, Year, Pollution_Exp, 2:25, factor_key=TRUE)
+
+#urban population
+urban <- data.frame(read_xls("Datasets/urban.xls"))
+urban <- subset(urban, select = -c(2:34))
+urban <- subset(urban, select = -c(26:32))
+colnames(urban) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999",
+                           "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010",
+                           "2011", "2012", "2013")
+urban_long <- gather(urban, Year, Urban_Pop, 2:25, factor_key=TRUE)
+
+#merge with existing indicators
+climate_change4 <- merge(electricity_long, water_long, by=c("Country", "Year"))
+climate_change5 <- merge(climate_change4, pollution_long, by=c("Country", "Year"))
+climate_change6 <- merge(climate_change5, urban_long, by=c("Country", "Year"))
+temp_data2 <- merge(climate_change6, temp_data, by=c("Country", "Year"))
+
+
+
+#merge World Bank Data sets
+climate_change1 <- merge(forest_area_long, renewable_energy_pct_long, by=c("Country", "Year"))
+climate_change2 <- merge(climate_change1, population_long, by=c("Country", "Year"))
+climate_change3 <- merge(climate_change2, energy_use_long, by=c("Country", "Year"))
+climate_change <- merge(climate_change3, co2_emissions_long, by=c("Country", "Year"))
+
+#merge with temperature data set
+summary_temp_data <- subset(summary_temp_data, summary_temp_data$Year >= 1990)
+colnames(summary_temp_data) <- c("Year", "Country", "Temperature")
+
+temp_data <- merge(climate_change, summary_temp_data, by=c("Country", "Year"))
+
+```
+
+
+
 ###Step 7
 ***Regional Linear Regression - Africa***
 ```{r step7}
@@ -366,6 +429,7 @@ summary(oceania_model)
 
 #faraway::vif(model1)
 ```
+
 ###Step 12
 ***Feature Selection (Adjusted R^2)***
 ```{r step12}
