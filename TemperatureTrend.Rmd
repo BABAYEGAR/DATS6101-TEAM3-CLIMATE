@@ -330,7 +330,6 @@ climate_change6 <- merge(climate_change5, urban_long, by=c("Country", "Year"))
 temp_data2 <- merge(climate_change6, temp_data, by=c("Country", "Year"))
 
 
-
 #merge World Bank Data sets
 climate_change1 <- merge(forest_area_long, renewable_energy_pct_long, by=c("Country", "Year"))
 climate_change2 <- merge(climate_change1, population_long, by=c("Country", "Year"))
@@ -355,10 +354,10 @@ temp_data <- merge(climate_change, summary_temp_data, by=c("Country", "Year"))
 temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
 africa_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Africa',select=-c(1,2,9))
 africa_temp_data_cor[is.na(africa_temp_data_cor)] = 0
-africa_tempcor <- cor(temp_data_cor)
+africa_tempcor <- cor(africa_temp_data_cor)
 corrplot(africa_tempcor, method = "number", type="upper")
 #linear model ##Note: Model variables are selected based on variables closer to 1 and -1
-africa_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions+ Forest_Area , data=subset(temp_data ,temp_data$Region == 'Africa'))
+africa_model <- lm(Temperature ~ Energy_Use + Co2_Emissions + Forest_Area , data=subset(temp_data ,temp_data$Region == 'Africa'))
 summary(africa_model)
 
 #faraway::vif(model1)
@@ -372,11 +371,11 @@ summary(africa_model)
 temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
 americas_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Americas',select=-c(1,2,9))
 americas_temp_data_cor[is.na(americas_temp_data_cor)] = 0
-americas_tempcor <- cor(temp_data_cor)
+americas_tempcor <- cor(americas_temp_data_cor)
 
 corrplot(americas_tempcor, method = "number", type="upper")
 #linear model ##Note: Model variables are selected based on variables closer to 1 and -1
-americas_model <- lm(Temperature ~ Energy_Use + Renew_Energy_Pct + Co2_Emissions + Forest_Area, data=subset(temp_data ,temp_data$Region == 'Americas'))
+americas_model <- lm(Temperature ~ Energy_Use + Co2_Emissions  + Forest_Area+ Population_Total  + Renew_Energy_Pct , data=subset(temp_data ,temp_data$Region == 'Americas'))
 summary(americas_model)
 
 #faraway::vif(model1)
@@ -389,10 +388,10 @@ summary(americas_model)
 temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
 asia_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Asia',select=-c(1,2,9))
 asia_temp_data_cor[is.na(asia_temp_data_cor)] = 0
-asia_tempcor <- cor(temp_data_cor)
+asia_tempcor <- cor(asia_temp_data_cor)
 corrplot(asia_tempcor, method = "number", type="upper")
 #linear model ##Note: Model variables are selected based on variables closer to 1 and -1
-asia_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions + Forest_Area, data=subset(temp_data ,temp_data$Region == 'Asia'))
+asia_model <- lm(Temperature ~ Energy_Use + Forest_Area+Renew_Energy_Pct , data=subset(temp_data ,temp_data$Region == 'Asia'))
 summary(asia_model)
 
 #faraway::vif(model1)
@@ -405,14 +404,15 @@ summary(asia_model)
 temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
 europe_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Europe',select=-c(1,2,9))
 europe_temp_data_cor[is.na(europe_temp_data_cor)] = 0
-europe_tempcor <- cor(temp_data_cor)
+europe_tempcor <- cor(europe_temp_data_cor)
 corrplot(europe_tempcor, method = "number", type="upper")
 #linear model ##Note: Model variables are selected based on variables closer to 1 and -1
-europe_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions + Forest_Area, data=subset(temp_data ,temp_data$Region == 'Europe'))
+europe_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions + Population_Total, data=subset(temp_data ,temp_data$Region == 'Europe'))
 summary(europe_model)
 
 #faraway::vif(model1)
 ```
+
 ###Step 11
 ***Regional Linear Regression - Oceania***
 ```{r step11}
@@ -421,58 +421,76 @@ summary(europe_model)
 temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
 oceania_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Oceania',select=-c(1,2,9))
 oceania_temp_data_cor[is.na(oceania_temp_data_cor)] = 0
-oceania_tempcor <- cor(temp_data_cor)
+oceania_tempcor <- cor(oceania_temp_data_cor)
 corrplot(oceania_tempcor, method = "number", type="upper")
 #linear model ##Note: Model variables are selected based on variables closer to 1 and -1
-oceania_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions + Forest_Area, data=subset(temp_data ,temp_data$Region == 'Oceania'))
+oceania_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions + Population_Total + Forest_Area, data=subset(temp_data ,temp_data$Region == 'Oceania'))
 summary(oceania_model)
 
 #faraway::vif(model1)
 ```
-
 ###Step 12
-***Feature Selection (Adjusted R^2)***
+***Rebuild Linear Regression with new variables***
 ```{r step12}
-loadPkg("leaps")
-temp_data_clean = temp_data[ , c("Forest_Area", "Renew_Energy_Pct", "Population_Total", "Energy_Use", "Co2_Emissions","Temperature")] 
+#correlation plot
+#remove categorical variables for plot
+temp_data_cor2 <- subset(temp_data2, select=-c(1,2,13))
+temp_data_cor2[is.na(temp_data_cor2)] = 0
+tempcor2 <- cor(temp_data_cor2)
+corrplot(tempcor2, method = "number", type="upper")
 
-adj_selection <- regsubsets(Temperature~., data = temp_data_clean, nbest = 2, method = "exhaustive") 
+#linear model ##Note: Model variables are selected based on variables closer to 1 and -1
+model1 <- lm(Temperature ~ Energy_Use + Renew_Energy_Pct  + Co2_Emissions + Forest_Area +Pollution_Exp  + Population_Total, data=temp_data2)
+summary(model1)
+
+model2 <- lm(Temperature ~ Energy_Use + Renew_Energy_Pct  + Co2_Emissions +Pollution_Exp  + Population_Total, data=temp_data2)
+summary(model2)
+
+```
+
+
+###Step 13
+***Feature Selection (Adjusted R^2)***
+```{r step13}
+loadPkg("leaps")
+temp_data2
+temp_data_clean2 = temp_data2[ , c("Forest_Area", "Renew_Energy_Pct", "Population_Total", "Energy_Use", "Co2_Emissions","Temperature","Electricity_Access","Water_withdrawal","Pollution_Exp","Urban_Pop")] 
+
+adj_selection <- regsubsets(Temperature~., data = temp_data_clean2, nbest = 2, method = "exhaustive") 
 plot(adj_selection, scale = "adjr2", main = "Adjusted R^2")
 adj_selection_summary = summary(adj_selection)
 adj_selection_summary$which[8,]
 adj_selection_summary
 
-adj_model <- lm(Temperature ~ Energy_Use + Renew_Energy_Pct + Co2_Emissions + Population_Total , data = temp_data_clean)
+adj_model <- lm(Temperature ~ Pollution_Exp + Electricity_Access + Energy_Use +  Urban_Pop + Co2_Emissions , data = temp_data_clean2)
 summary(adj_model)
 faraway::vif(adj_model)
 
 
 ```
-###Step 13
+###Step 14
 ***Feature Selection (BIC)***
-```{r step13}
-bic_selection <- regsubsets(Temperature~., data = temp_data_clean, nbest = 2, method = "exhaustive") 
+```{r step14}
+bic_selection <- regsubsets(Temperature~., data = temp_data_clean2, nbest = 2, method = "exhaustive") 
 plot(bic_selection, scale = "bic", main = "BIC")
 bic_selection_summary = summary(bic_selection)
 bic_selection_summary$which[8,]
 bic_selection_summary
 
-bic_model <- lm(Temperature ~ Energy_Use + Renew_Energy_Pct + Co2_Emissions + Population_Total , data = temp_data_clean)
+bic_model <- lm(Temperature ~ Pollution_Exp + Electricity_Access + Energy_Use +  Urban_Pop + Co2_Emissions , data = temp_data_clean2)
 summary(bic_model)
 faraway::vif(bic_model)
 
 ```
-###Step 14
+###Step 15
 ***Feature Selection (Cp)***
-```{r step13}
-cp_selection <- regsubsets(Temperature~., data = temp_data_clean, nbest = 2, method = "exhaustive") 
+```{r step15}
+cp_selection <- regsubsets(Temperature~., data = temp_data_clean2, nbest = 2, method = "exhaustive") 
 plot(cp_selection, scale = "Cp", main = "Cp")
 cp_selection_summary = summary(cp_selection)
 cp_selection_summary$which[8,]
-cp_selection_summary
 
-cp_model <- lm(Temperature ~ Energy_Use + Renew_Energy_Pct + Co2_Emissions + Population_Total , data = temp_data_clean)
-summary(cp_model)
+cp_model <-  lm(Temperature ~ Pollution_Exp + Electricity_Access + Energy_Use +  Urban_Pop + Co2_Emissions , data = temp_data_clean2)
 faraway::vif(cp_model)
 
 ```

@@ -1,0 +1,514 @@
+---
+title: "Climate Change: Analyzing Earth Surface Temperature Data"
+author: "Team 3: Sonia Clemens, Salim Haruna, Lauren Korlewitz, and Anna Zhu"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    theme: flatly
+    # number_sections: true
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+
+```{r basic, include=F}
+# use this function to conveniently load libraries and work smoothly with knitting
+# can add quietly=T option to the require() function
+# the loadPkg function essentially replaced/substituted two functions install.packages() and library() in one step.
+loadPkg = function(x) { if (!require(x,character.only=T, quietly =T)) { install.packages(x,dep=T,repos="http://cran.us.r-project.org"); if(!require(x,character.only=T)) stop("Package not found") } }
+
+# unload/detact package when done using it
+unloadPkg = function(pkg, character.only = FALSE) { 
+  if(!character.only) { pkg <- as.character(substitute(pkg)) } 
+  search_item <- paste("package", pkg,sep = ":") 
+  while(search_item %in% search()) { detach(search_item, unload = TRUE, character.only = TRUE) } 
+}
+```
+
+```{r setup, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+# knitr::opts_chunk$set(include = F)
+# knitr::opts_chunk$set(echo = TRUE)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
+# use scipen=999 to prevent scientific notation at all times
+```
+
+```{r xkablesummary , include=FALSE}
+loadPkg("xtable")
+loadPkg("kableExtra")
+loadPkg("stringi")
+loadPkg("readr")
+loadPkg("dplyr")
+loadPkg("ggplot2")
+loadPkg("countrycode")
+loadPkg("reshape")
+loadPkg("corrplot")
+loadPkg("tidyr")
+loadPkg("readxl")
+
+
+xkabledply = function(modelsmmrytable, title="Table", digits = 4, pos="left", bso="striped", wide=FALSE) { 
+  #' Combining base::summary, xtable, and kableExtra, to easily display model summary. 
+  #' wrapper for the base::summary function on model objects
+  #' Can also use as head for better display
+  #' ELo 202004 GWU DATS
+  #' version 1.2
+  #' @param modelsmmrytable This can be a generic table, a model object such as lm(), or the summary of a model object summary(lm()) 
+  #' @param title Title of table. 
+  #' @param digits Number of digits to display
+  #' @param pos Position of table, c("left","center","right") 
+  #' @param bso bootstrap_options = c("basic", "striped", "bordered", "hover", "condensed", "responsive")
+  #' @param wide print table in long (FALSE) format or wide (TRUE) format
+  #' @return HTML table for display
+  #' @examples
+  #' library("xtable")
+  #' library("kableExtra")
+  #' xkabledply( df, title="Table testing", pos="left", bso="hover" )
+  #' xkabledply( ISLR::Hitters[1:5,] )
+  if (wide) { modelsmmrytable <- t(modelsmmrytable) }
+  modelsmmrytable %>%
+    xtable() %>% 
+    kable(caption = title, digits = digits) %>%
+    kable_styling(bootstrap_options = bso, full_width = FALSE, position = pos)
+}
+
+xkabledplyhead = function(df, rows=5, title="Head", digits = 4, pos="left", bso="striped") { 
+  xkabledply(df[1:rows, ], title, digits, pos, bso, wide=FALSE)
+}
+
+xkabledplytail = function(df, rows=5, title="Tail", digits = 4, pos="left", bso="striped") { 
+  trows = nrow(df)
+  xkabledply(df[ (trows-rows+1) : trows, ], title, digits, pos, bso, wide=FALSE)
+}
+
+xkablesummary = function(df, title="Table: Statistics summary.", digits = 4, pos="left", bso="striped") { 
+  #' Combining base::summary, xtable, and kableExtra, to easily display numeric variable summary of dataframes. 
+  #' ELo 202004 GWU DATS
+  #' version 1.2
+  #' @param df The dataframe.
+  #' @param title Title of table. 
+  #' @param digits Number of digits to display
+  #' @param pos Position of table, c("left","center","right") 
+  #' @param bso bootstrap_options = c("basic", "striped", "bordered", "hover", "condensed", "responsive")
+  #' @return The HTML summary table for display, or for knitr to process into other formats 
+  #' @examples
+  #' xkablesummary( faraway::ozone )
+  #' xkablesummary( ISLR::Hitters, title="Five number summary", pos="left", bso="hover"  )
+  
+  s = summary(df) %>%
+    apply( 2, function(x) stringr::str_remove_all(x,c("Min.\\s*:\\s*","1st Qu.\\s*:\\s*","Median\\s*:\\s*","Mean\\s*:\\s*","3rd Qu.\\s*:\\s*","Max.\\s*:\\s*")) ) %>% # replace all leading words
+    apply( 2, function(x) stringr::str_trim(x, "right")) # trim trailing spaces left
+  
+  colnames(s) <- stringr::str_trim(colnames(s))
+  
+  if ( dim(s)[1] ==6 ) { rownames(s) <- c('Min','Q1','Median','Mean','Q3','Max') 
+  } else if ( dim(s)[1] ==7 ) { rownames(s) <- c('Min','Q1','Median','Mean','Q3','Max','NA') }
+  
+  xkabledply(s, title=title, digits = digits, pos=pos, bso=bso )
+}
+
+xkablevif = function(model, title="VIFs of the model", digits = 3, pos="left", bso="striped", wide=TRUE) { 
+  #' Combining faraway::vif, xtable, and kableExtra, to easily display numeric summary of VIFs for a model. 
+  #' ELo 202004 GWU DATS
+  #' version 1.2
+  #' @param model The lm or compatible model object.
+  #' @param title Title of table. 
+  #' @param digits Number of digits to display
+  #' @param pos Position of table, c("left","center","right") 
+  #' @param bso bootstrap_options = c("basic", "striped", "bordered", "hover", "condensed", "responsive")
+  #' @param wide print table in long (FALSE) format or wide (TRUE) format
+  #' @return The HTML summary table of the VIFs for a model for display, or for knitr to process into other formats 
+  #' @examples
+  #' xkablevif( lm(Salary~Hits+RBI, data=ISLR::Hitters), wide=T )
+  
+  vifs = table( names(model$coefficients)[2:length(model$coefficients)] ) # remove intercept to set column names
+  vifs[] = faraway::vif(model) # set the values
+  if (wide) { vifs <- t(vifs) }
+  xkabledply( vifs, title=title, digits = digits, pos=pos, bso=bso )
+}
+```
+
+# 1. Introduction
+
+### 1.1 Motivation and Research Objectives
+
+Climate change is one of the most widely researched and heavily debated topics of the 21st century, as it not only impacts human systems and the biosphere, but also the hydrosphere, cryosphere, and lithosphere.   
+
+In the past decade alone, carbon dioxide concentrations have risen above 400 parts per million (ppm) for the first time in recorded history (Mikhaylov et al., 2020).  Rising land temperatures as well as increased frequency of natural disasters (drought, wildfires, flooding, etc,) are reflective of these changes in atmospheric carbon dioxide concentrations.  Furthermore, some regions, such as the Arctic, are disproportionately affected by climate change, with mean land surface temperatures warming at twice the global rate in that region (Overland et al., 2017).
+
+### 1.2 Previous Research
+
+While this topic has been extensively researched, many climate change studies are focused on specific climate feedback such as permafrost thaw or Arctic sea ice decline. To add to the already expansive framework of climate change, this project seeks to provide a more broad analysis of temperature change on a global scale over the past two centuries.
+
+# 2. Datasets
+
+### 2.1 Origin
+
+This project will explore regional and global records of temperature using open source earth surface temperature data from Kaggle and the World Bank. 
+
+The first dataset from Kaggle contains average surface temperature by country from 1743 to 2013. This dataset consists of more than 544,811 observations and contains four variables: year, average temperature, average temperature uncertainty, and the country in which these  temperatures were recorded.  Using this dataset, regional and global temperature trends were explored. 
+
+The second dataset is sourced from the World Bank and contains data points by country from 1990 to 2013. This dataset consists of 6,336 observations for each of the following categories: CO2 emissions, renewable energy consumption (%), population total, energy use, and forest area.  This dataset provides data on the potential predictor variables of surface temperature.
+
+### 2.2 Limitations
+
+The expansive nature of the datasets presented several limitations for analysis. With values ranging from 1743 at the earliest to present times at the latest, the surface temperature dataset specifically needed cleaning and sorting before it could be used for proper exploratory data analysis (EDA) (see "Data Cleaning for Linear Regression").
+
+First, three new variables were created within the surface temperature data set from Kaggle, including region, century, and decade. Afterwards, the century and decade variables were converted into factor format to allow temperatures to be grouped into certain time periods. The final step in formatting this dataset was to drop missing values. There were many missing values over the long study period that can be traced to a lack of substantial population. For example, many values prior to the 1800s in South America were noticeably void as the region had not yet been colonized. 
+
+In the World Bank datasets, there were not as many missing values or formatting issues that needed to be resolved, although the data did require reformatting to be used for this project. The categories of CO2 emissions, renewable energy consumption (%), population total, energy use, and forest area were used as predictor variables in the linear model. To enable EDA using this dataset, the datasets were formatted from wide to long form so that each row would count as a singular observation. Afterwards, data outside of the 1990 to 2013 range was dropped to allow the five variables to be merged together for cleaner processing of the predictor variables in the model. Because some data such as renewable energy use were not measured until the 1990s, this time range was chosen to ensure consistency for the analysis.
+
+
+# 3. SMART Questions
+
+Based on the research goals and the scope of the datasets, the Specific, Measurable, Achievable, Realistic, and Timely (SMART) questions for the project are as follows:
+
+1. Are surface temperatures changing over time?
+2. What factors impact surface temperatures?
+
+To answer the first SMART question, a combination of boxplots, histograms, and line graphs were used. Upon preliminary testing, it was found that decadal temperature changes were too similar to show any distinct differences.  Instead, a centurial time scale was used.  A two-sample t-test and an ANOVA were used to identify if average temperatures were different in the 1990s and 2000s and if surface temperatures were different across regions respectively. 
+
+For the second SMART question, a linear model was constructed using the following variables: forest area, renewable energy percentage, population totals, energy use, CO2 emissions, and temperatures to predict surface temperatures. 
+
+
+# 4. Exploratory Data Analysis
+
+
+## 4.1 Import the Data
+```{r step1, include=T, warning=F}
+global_temps <- data.frame(read_csv("Datasets/GlobalTemp.csv"))
+global_temps$Region <- countrycode(sourcevar = global_temps[, "Country"],origin = "country.name",destination = "continent")
+names(global_temps)[1] <- 'Year'
+global_temps$Year <- as.integer(format(global_temps$Year, format="%Y"))
+global_temps$Decade <- (global_temps$Year - global_temps$Year %% 10)
+global_temps$Century <- (global_temps$Year - global_temps$Year %% 100)
+```
+
+## 4.2 Global Temperatures
+```{r step2, include=T, warning=F}
+temp_histogram <- ggplot(global_temps, aes(x=AverageTemperature)) +
+  geom_histogram(color="dark blue", fill= "lightblue") +
+  labs(title ="Histogram of Global Average Surface Temperature", subtitle="1743 - 2013") +
+  xlab("Average Surface Temperature") +
+  ylab("Frequency")
+temp_histogram
+
+temp_qq <- qqnorm(global_temps$AverageTemperature, main= "Average Surface Temperature: Normal Q-Q Plot"); qqline(global_temps$AverageTemperature, col="blue")
+temp_qq
+
+summary(global_temps)
+sd(global_temps$AverageTemperature)
+```
+### 4.2A Histogram
+The histogram of global average surface temperature from 1743 to 2013 yielded expected results, with a mean of 17.2 on an overall left skewed distribution. This histogram allowed further analysis since it confirmed that global temperatures fall into an average level of approximately 17 degrees C or 63 degrees F. A value too high or too low would require reassessment of the dataset, since humans require livable temperatures.
+
+### 4.2B Q-Q Plot
+The Q-Q plot for average surface temperature supported the conclusions drawn by the histogram, as it also suggested a left skewed distribution, with values peaking towards the middle left of the graph.
+
+## 4.3 Centural Temperatures
+```{r step3, include=T, warning=F}
+global_temps <-  na.omit(global_temps)
+global_temps$Century <- as.factor(global_temps$Century)
+global_temps$Decade <- as.factor(global_temps$Decade)
+
+century_temp_data <- global_temps %>% group_by(Century, Year) %>%
+  summarize(mean(AverageTemperature))
+
+#line graph of overall trend
+century_trends_line_plot <- ggplot() +
+  geom_line(data=century_temp_data, aes(x=Year, y=`mean(AverageTemperature)`, color=factor(Century))) +
+  xlab("Year") +
+  ylab("Average Temperature (celcius)") +
+  labs(title="Surface Temperature Trends Over Time", color="Century")
+century_trends_line_plot
+
+#boxplot by century
+century_year_temp_data_boxplot <- ggplot(century_temp_data, aes(x=as.factor(century_temp_data$Century), y=`mean(AverageTemperature)`, color=Century)) + 
+  geom_boxplot() +
+  labs(title="Boxplot of Global Surface Temperatures by Century") +
+  xlab("Century") +
+  ylab("Average Temperature (celcius)") +
+  coord_cartesian(ylim = c(0, 20))
+century_year_temp_data_boxplot
+
+```
+
+### 4.3A Lineplot & Boxplot
+
+Using the line graph and box plot, it can be determined that mean surface temperatures are increasing with every decade. This is consistent with the general consensus that the climate has been warming over time.
+
+## 4.4 Regional Temperature
+```{r step4, include=T, warning=F}
+global_temps <-  na.omit(global_temps)
+regional_year_temp_data <-  global_temps %>% group_by(Region, Year) %>% 
+summarize(mean(AverageTemperature))
+regional_year_temp_data_line_plot = ggplot() + 
+  geom_line(data = regional_year_temp_data, aes(x = Year, y = `mean(AverageTemperature)`, group = Region,color=Region)) +
+  labs(title="Line Plot of Surface Temperature Across Regions", subtitle="1743-2013") +
+  xlab('Year') +
+  ylab('Temperature Level') +
+  geom_point(size = 4, shape = 21)
+regional_year_temp_data_boxplot <- ggplot(regional_year_temp_data, aes(x=as.factor(regional_year_temp_data$Region), y=`mean(AverageTemperature)`, color=Region)) +   labs(title="Boxplot of Surface Temperature Across Regions", subtitle="1743-2013") +
+  xlab('Region') +
+  ylab('Temperature Level') +
+  geom_boxplot()
+
+print(regional_year_temp_data_line_plot)
+print(regional_year_temp_data_boxplot)
+
+```
+
+* From the boxplot, the Americas region has the highest interquartile range. This makes it the region with the most changed temperature level.
+
+* Highest mean surface temperatures were found in Oceania and Africa, followed by the Americas and Asia, with the coldest mean temperatures occurring in Europe
+
+* For all regions previously stated in the boxplot analysis, there were noticeable temperature increases most notably beginning in the early-to-mid 1800s. Even Oceania, for which the boxplot analysis showed to have some of the highest temperatures among all regions, temperatures increased throughout the mid 1800s to 2000s. The most dramatic rates of temperature increase were observed in the Americas and Asia. For other regions such as Europe, temperatures steadily increased albeit at a slower rate.
+
+# 5. Hypothesis Testing
+
+### 5.1 Anova Test - Do Temperatures Vary by Region?
+```{r step 5A, include=T, warning=F}
+reginal_aov = aov(`mean(AverageTemperature)` ~ Region, data = regional_year_temp_data)
+reginal_aov_summary = summary(reginal_aov)
+xkabledply(reginal_aov_summary)
+```
+
+### 5.2 t-test - Are 1900s and 2000s statistically different?
+```{r step 5B, include=T, warning=F}
+global_temps_1900s <- subset(global_temps, global_temps$Century == "1900")
+global_temps_2000s <- subset(global_temps, global_temps$Century == "2000")
+century_ttest <- t.test(global_temps_1900s$AverageTemperature, global_temps_2000s$AverageTemperature, alternative = "greater", conf.level = 0.95)
+century_ttest
+```
+
+### 5.3 Results of Hypothesis Testing
+* The ANOVA test identified if the surface temperatures were different across regions.  The results show that surface temperatures are different across the regions, as the p-value is [`r format(summary(reginal_aov)[[1]][["Pr(>F)"]])`] and the F-value is [`r format(summary(reginal_aov)[[1]][["F Value"]])`]. Due to the very high F value and very low p-value, we reject the null hypothesis and infer that the temperature across regions are different.
+
+* Using a two-sample t-test, differences between average surface temperatures in the 1900s and 2000s were analyzed. The two-sample t-test yielded a p-value of [`r format(century_ttest$p.value)`]. Due to the very low p-value, the null hypothesis is rejected implying that the temperature in 1900s and 2000s are slightly different in that there is a slight increase from 1900s to 2000s.
+
+# 6. Model Building
+
+## 6.1 Data Cleaning for Linear Regression
+```{r step6, include=T, warning=F}
+#format dataset to single observation by country per year
+summary_temp_data <-  global_temps %>% group_by(Year, Country) %>% 
+summarize(mean(AverageTemperature))
+
+#reformat World Bank datasets from wide to long (years 1990-2013)
+forest_area <- data.frame(read_xls("Datasets/forest_area.xls"))
+forest_area <- subset(forest_area, select = -c(2:34))
+forest_area <- subset(forest_area, select = -c(26:32))
+colnames(forest_area) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999",
+                           "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010",
+                           "2011", "2012", "2013")
+forest_area_long <- gather(forest_area, Year, Forest_Area, 2:25, factor_key = TRUE)
+
+renewable_energy_pct <- data.frame(read_xls("Datasets/renewable_energy.xls"))
+renewable_energy_pct <- subset(renewable_energy_pct, select = -c(2:34))
+renewable_energy_pct <- subset(renewable_energy_pct, select = -c(26:32))
+colnames(renewable_energy_pct) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",  "1999","2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013")
+renewable_energy_pct_long <- gather(renewable_energy_pct, Year, Renew_Energy_Pct, 2:25, factor_key=TRUE)
+
+population <- data.frame(read_xls("Datasets/population.xls"))
+population <- subset(population, select = -c(2:34))
+population <- subset(population, select = -c(26:32))
+colnames(population) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",  "1999","2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013")
+population_long <- gather(population, Year, Population_Total, 2:25, factor_key=TRUE)
+
+energy_use <- data.frame(read_xls("Datasets/energy_use.xls"))
+energy_use <- subset(energy_use, select = -c(2:34))
+energy_use <- subset(energy_use, select = -c(26:32))
+colnames(energy_use) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",  "1999","2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013")
+energy_use_long <- gather(energy_use, Year, Energy_Use, 2:25, factor_key=TRUE)
+
+Co2_emissions <- data.frame(read_xls("Datasets/C02_emissions.xls"))
+Co2_emissions <- subset(Co2_emissions, select = -c(2:34))
+Co2_emissions <- subset(Co2_emissions, select = -c(26:32))
+colnames(Co2_emissions) <- c("Country", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",  "1999","2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013")
+co2_emissions_long <- gather(Co2_emissions, Year, Co2_Emissions, 2:25, factor_key = TRUE)
+
+#merge World Bank Data sets
+climate_change1 <- merge(forest_area_long, renewable_energy_pct_long, by=c("Country", "Year"))
+climate_change2 <- merge(climate_change1, population_long, by=c("Country", "Year"))
+climate_change3 <- merge(climate_change2, energy_use_long, by=c("Country", "Year"))
+climate_change <- merge(climate_change3, co2_emissions_long, by=c("Country", "Year"))
+
+#merge with temperature data set
+summary_temp_data <- subset(summary_temp_data, summary_temp_data$Year >= 1990)
+colnames(summary_temp_data) <- c("Year", "Country", "Temperature")
+
+temp_data <- merge(climate_change, summary_temp_data, by=c("Country", "Year"))
+
+```
+
+## 6.2 Linear Regression
+```{r step7, include=T, warning=F}
+#correlation plot
+#remove categorical variables for plot
+temp_data_cor <- subset(temp_data, select=-c(1,2))
+temp_data_cor[is.na(temp_data_cor)] = 0
+tempcor <- cor(temp_data_cor)
+corrplot(tempcor, method = "number", type="upper")
+
+#linear model ##Note: Model variables are selected based on variables closer to 1 and -1
+model1 <- lm(Temperature ~ Renew_Energy_Pct + Co2_Emissions + Forest_Area  + Population_Total, data=temp_data)
+summary(model1)
+
+#rerun without population total
+model2 <- lm(Temperature ~ Renew_Energy_Pct + Energy_Use + Co2_Emissions + Forest_Area, data=temp_data)
+summary(model2)
+
+faraway::vif(model2)
+```
+
+## 6.3 Model Building and Results
+To begin model building, correlation between all numerical variables (forest area, renewable energy percentage, population totals, energy use, CO2 emissions, and temperatures) were examined using a correlation matrix.  Based on this plot matrix, all variables could be included in the model.  However, it is necessary to consider the correlations between energy usage and CO2 in reality, as environments with higher energy usage tend to have higher CO2 outputs that can cause a rise in temperature as seen in the U.S., China, and India.
+
+The following variables are significant at the 99% confidence level: renewable energy percentage, energy use, CO2 emissions and forest area. The only variable found insignificant by the model was population total. 
+
+The model was revised to include only the statistically significant variables mentioned above, omitting the population total variable. At the 99% confidence level, renewable energy percentage, energy use, CO2 emissions and forest area were found to be statistically significant. A check of the VIF values for the revised model indicated possible multicollinearity as energy use and CO2 emissions returned values over 5. The values, however, were not deemed high enough to remove them from the model.
+
+As such, the equation for our final model read that:
+Surface temperature (Celsius) = 15.70 + 0.116 * Renew_Energy_Pct - 0.0026 * Energy_Use
++ 0.9250* CO2_Emissions - 0.0000012* Forest_Area 
+
+Where the variable units for renewable energy percent resulted from the percentage of total energy usage and energy use equals kilogram of oil equivalent per capita. CO2 emissions are reported in metric tons per capita and forest area in square kilometers.
+The R Squared for the revised model is `r format(summary(model2)$r.squared * 100)`% .
+
+## 6.4 Regional Linear Regression
+
+### 6.4A Africa
+```{r step8, include=T, warning=F}
+#correlation plot
+#remove categorical variables for plot
+temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
+africa_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Africa',select=-c(1,2,9))
+africa_temp_data_cor[is.na(africa_temp_data_cor)] = 0
+africa_tempcor <- cor(temp_data_cor)
+corrplot(africa_tempcor, method = "number", type="upper")
+#linear model ##Note: Model variables are selected based on variables closer to 1 and -1
+africa_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions+ Forest_Area , data=subset(temp_data ,temp_data$Region == 'Africa'))
+summary(africa_model)
+```
+For the Africa region, the following variables are significant at the 99% confidence level: renewable energy percentage and forest area. The variables found insignificant by the model was energy use and CO2 emissions. The R Squared is `r format(summary(africa_model)$r.squared * 100)`%.
+
+
+### 6.4B Americas
+```{r step9, include=T, warning=F}
+#correlation plot
+#remove categorical variables for plot
+temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
+americas_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Americas',select=-c(1,2,9))
+americas_temp_data_cor[is.na(americas_temp_data_cor)] = 0
+americas_tempcor <- cor(temp_data_cor)
+
+corrplot(americas_tempcor, method = "number", type="upper")
+#linear model ##Note: Model variables are selected based on variables closer to 1 and -1
+americas_model <- lm(Temperature ~ Energy_Use + Renew_Energy_Pct + Co2_Emissions + Forest_Area, data=subset(temp_data ,temp_data$Region == 'Americas'))
+summary(americas_model)
+```
+For the Americas region, all variables are significant at the 99% confidence level. The R Squared is `r format(summary(americas_model)$r.squared * 100)` % .
+
+
+### 6.4C Asia
+```{r step10, include=T, warning=F}
+#correlation plot
+#remove categorical variables for plot
+temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
+asia_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Asia',select=-c(1,2,9))
+asia_temp_data_cor[is.na(asia_temp_data_cor)] = 0
+asia_tempcor <- cor(temp_data_cor)
+corrplot(asia_tempcor, method = "number", type="upper")
+#linear model ##Note: Model variables are selected based on variables closer to 1 and -1
+asia_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions + Forest_Area, data=subset(temp_data ,temp_data$Region == 'Asia'))
+summary(asia_model)
+```
+For the Asia region, all variables are significant at the 99% confidence level. The R Squared is `r format(summary(asia_model)$r.squared * 100)`% .
+
+### 6.4D Europe
+```{r step11, include=T, warning=F}
+#correlation plot
+#remove categorical variables for plot
+temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
+europe_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Europe',select=-c(1,2,9))
+europe_temp_data_cor[is.na(europe_temp_data_cor)] = 0
+europe_tempcor <- cor(temp_data_cor)
+corrplot(europe_tempcor, method = "number", type="upper")
+#linear model ##Note: Model variables are selected based on variables closer to 1 and -1
+europe_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions + Forest_Area, data=subset(temp_data ,temp_data$Region == 'Europe'))
+summary(europe_model)
+```
+For the Europe region, the following variables are significant at the 99% confidence level: renewable energy percentage and CO2 emissions. The variables found insignificant by the model was energy use and forest area. The R Squared is `r format(summary(europe_model)$r.squared * 100)`% .
+
+### 6.4E Oceania
+```{r step12, include=T, warning=F}
+#correlation plot
+#remove categorical variables for plot
+temp_data$Region <- countrycode(sourcevar = temp_data[, "Country"],origin = "country.name",destination = "continent")
+oceania_temp_data_cor <- subset(temp_data ,temp_data$Region == 'Oceania',select=-c(1,2,9))
+oceania_temp_data_cor[is.na(oceania_temp_data_cor)] = 0
+oceania_tempcor <- cor(temp_data_cor)
+corrplot(oceania_tempcor, method = "number", type="upper")
+#linear model ##Note: Model variables are selected based on variables closer to 1 and -1
+oceania_model <- lm(Temperature ~ Energy_Use +Renew_Energy_Pct + Co2_Emissions + Forest_Area, data=subset(temp_data ,temp_data$Region == 'Oceania'))
+summary(oceania_model)
+```
+For the Oceania region, the following variables are significant at the 99% confidence level: renewable energy percentage, energy use, and CO2 emissions. Forest area is significant at the 95% confidence level. The R Squared is `r format(summary(oceania_model)$r.squared * 100)`% .
+
+
+# 7. Conclusion
+
+## 7.1 Question 1
+
+### 7.1A Are surface temperatures changing over time?
+
+From the boxplot, the Americas region has the highest interquartile range. This makes it the region with the most changed temperature level.
+
+Highest mean surface temperatures were found in Oceania and Africa, followed by the Americas and Asia, with the coldest mean temperatures occurring in Europe
+
+For all regions previously stated in the boxplot analysis, there were noticeable temperature increases most notably beginning in the early-to-mid 1800s. Even Oceania, for which the boxplot analysis showed to have some of the highest temperatures among all regions, temperatures increased throughout the mid 1800s to 2000s. The most dramatic rates of temperature increase were observed in the Americas and Asia. For other regions such as Europe, temperatures steadily increased albeit at a slower rate.
+
+## 7.2 Question 2
+
+### 7.2A What factors impact surface temperatures?
+
+According to the equation, the most influential factor in surface temperature increase is CO2 emissions, which contributes the most to temperature rise. Renewable energy percentage was also found to have a minimal contribution to surface temperature rise, while energy use was found to detract from surface temperature increase. Forested area was also linked to decreases in surface temperature by the revised model and this is consistent with studies that indicate forests to be carbon sinks (Luyssaert et al., 2008).
+
+# 8. Bibliography
+Kaggle. (1743–2013). Climate Change: Earth Surface Temperature Data [Dataset]. 
+https://www.kaggle.com/berkeleyearth/climate-change-earth-surface-temperature-data
+
+Luyssaert, S., Schulze, E. D., Börner, A., Knohl, A., Hessenmöller, D., Law, B. E., ... & Grace, J. 
+(2008). Old-growth forests as global carbon sinks. Nature, 455(7210), 213-215.
+
+Mikhaylov, A., Moiseev, N., Aleshin, K., & Burkhardt, T. (2020). Global climate change and 
+greenhouse effect. Entrepreneurship and Sustainability Issues, 7(4), 2897.
+
+Overland, J. E., Hanna, E., Hanssen-Bauer, I., Kim, S. J., Walsh, J. E., Wang, M., Bhatt, U.S., & 
+Thoman, R. L. (2017). Surface air temperature. Arctic report card.
+
+World Bank. (1990–2013). CO2 emissions (metric tons per capita) [Dataset]. 
+https://data.worldbank.org/indicator/EN.ATM.CO2E.PC?view=chart
+
+World Bank. (1990–2013b). Energy use (kg of oil equivalent per capita) [Dataset]. 
+https://data.worldbank.org/indicator/EG.USE.PCAP.KG.OE?view=chart
+
+World Bank. (1990–2013c). Forest area (sq. km) [Dataset]. 
+https://data.worldbank.org/indicator/AG.LND.FRST.K2?view=chart
+
+World Bank. (1990–2013d). Population, total [Dataset]. 
+https://data.worldbank.org/indicator/SP.POP.TOTL?view=chart
+
+World Bank. (1990–2013e). Renewable energy consumption (% of total final energy consumption) [Dataset]. 
+https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS?view=chart
+
