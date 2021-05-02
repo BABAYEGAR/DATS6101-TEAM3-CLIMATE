@@ -494,5 +494,110 @@ cp_model <-  lm(Temperature ~ Pollution_Exp + Electricity_Access + Energy_Use + 
 faraway::vif(cp_model)
 
 ```
+###Global Time Series Analysis
+```{r}
+#create summary dataset
+loadPkg("dplyr")
+summary_temps <- global_temps %>% group_by(Year) %>%
+  summarize(mean(AverageTemperature))
+colnames(summary_temps) <- c("Year","Temperature")
+
+#time series of temperatures from 1743
+#ts1 <- ts(data = summary_temps$Temperature, start=c(1743), frequency=1)
+# plot.ts(ts1, type="l", col="blue", lwd =2, 
+#         ylab="Annual Surface Temperature (Celcius)", xlab="Year") +
+#   title("Annual Global Surface Temperatures (1743-2013)") +
+#   abline(h=0, col="darkorange2", lwd=2) +
+#   text(2000, -0.1, "1743-2013 average")
 
 
+#subset for data from 1900
+summary_temps_1900 <- subset(summary_temps, summary_temps$Year >= 1900)
+ts2 <- ts(data = summary_temps_1900$Temperature, start=c(1900), frequency=1)
+plot.ts(ts2, type ="l", col="blue", lwd=2,
+        ylab="Annual Surface Temperature (Celcius)", xlab="Year") +
+  title("Annual Global Surface Temperature (1900-2013)")
+
+loadPkg("forecast")
+loadPkg("zoo")
+model1 <- auto.arima(as.zoo(ts2))
+forecast(model, 40)
+plot1 <- plot(forecast(model, 40), main = "Global Temperature Predictions until 2053", xlab = "Year", ylab = "Average Temperature (Celcius)")
+
+```
+
+###United States Analysis
+```{r}
+US_temps <- subset(global_temps, global_temps$Country == "United States")
+
+summary_US_temps <- US_temps %>% group_by(Year) %>%
+  summarize(mean(AverageTemperature))
+colnames(summary_US_temps) <- c("Year","Temperature")
+
+US_temps_1900 <- subset(summary_US_temps, summary_US_temps$Year >= 1900)
+
+# ts_us <- ts(data = summary_US_temps$Temperature, start=c(1768), frequency=1)
+# ts_us_plot <- plot.ts(ts_us, type ="l", col="blue", lwd=2,
+#         ylab="Annual Surface Temperature (Celcius)", xlab="Year") +
+#   title("Annual Global Surface Temperature in United States (1768-2013)")
+
+ts_us2 <- ts(data = US_temps_1900$Temperature, start=c(1900), frequency=1)
+ts_us_plot2 <- plot.ts(ts_us2, type ="l", col="blue", lwd=2,
+        ylab="Annual Surface Temperature (Celcius)", xlab="Year") +
+  title("Annual Global Surface Temperature in United States (1900-2013)")
+
+
+loadPkg("forecast")
+loadPkg("zoo")
+model2 <- auto.arima(as.zoo(ts_us2))
+forecast(model2, 40)
+plot2 <- plot(forecast(model2, 40), main = "United States Temperature Predictions until 2053", xlab = "Year", ylab = "Average Temperature (Celcius)")
+
+```
+
+###Iceland Analysis
+```{r}
+Iceland_temps <- subset(global_temps, global_temps$Country == "Iceland")
+
+summary_Iceland_temps <- Iceland_temps %>% group_by(Year) %>%
+  summarize(mean(AverageTemperature))
+colnames(summary_Iceland_temps) <- c("Year","Temperature")
+
+Iceland_temps_1900 <- subset(summary_Iceland_temps, summary_Iceland_temps$Year >= 1900)
+
+ts_ice <- ts(data = Iceland_temps_1900$Temperature, start=c(1900), frequency=1)
+ts_ice_plot <- plot.ts(ts_ice, type ="l", col="blue", lwd=2,
+        ylab="Annual Surface Temperature (Celcius)", xlab="Year") +
+  title("Annual Global Surface Temperature in Iceland (1900-2013)")
+
+
+loadPkg("forecast")
+loadPkg("zoo")
+model3 <- auto.arima(as.zoo(ts_ice))
+forecast(model3, 40)
+plot3 <- plot(forecast(model3, 40), main = "Iceland Temperature Predictions until 2053", xlab = "Year", ylab = "Average Temperature (Celcius)")
+```
+
+
+###Haiti Analysis
+```{r}
+Haiti_temps <- subset(global_temps, global_temps$Country == "Haiti")
+
+summary_haiti_temps <- Haiti_temps %>% group_by(Year) %>%
+  summarize(mean(AverageTemperature))
+colnames(summary_haiti_temps) <- c("Year","Temperature")
+
+haiti_temps_1900 <- subset(summary_haiti_temps, summary_haiti_temps$Year >= 1900)
+
+ts_haiti <- ts(data = haiti_temps_1900$Temperature, start=c(1900), frequency=1)
+ts_haiti_plot <- plot.ts(ts_haiti, type ="l", col="blue", lwd=2,
+        ylab="Annual Surface Temperature (Celcius)", xlab="Year") +
+  title("Annual Global Surface Temperature in Haiti (1900-2013)")
+
+
+loadPkg("forecast")
+loadPkg("zoo")
+model4 <- auto.arima(as.zoo(ts_haiti))
+forecast(model4, 40)
+plot4 <- plot(forecast(model4, 40), main = "Haiti Temperature Predictions until 2053", xlab = "Year", ylab = "Average Temperature (Celcius)")
+```
