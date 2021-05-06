@@ -184,7 +184,7 @@ Based on the conclusions from project 1, the analysis for the second half of thi
 
 # 4. Analysis
 
-###Step 1
+### Step 1
 **Import the data**
 
 ```{r step1}
@@ -197,7 +197,7 @@ global_temps
 
 ```
 
-###Step 2
+### Step 2
 ***Analyze temperature data***
 ```{r step2}
 temp_histogram <- ggplot(global_temps, aes(x=AverageTemperature)) +
@@ -217,7 +217,7 @@ sd(global_temps$AverageTemperature)
 ### Step 2 Results: Histogram
 The histogram of global average surface temperature from 1743 to 2013 yielded expected results, with a mean of 17.2 on an overall left skewed distribution. This histogram allowed further analysis since it confirmed that global temperatures fall into an average level of approximately 17 degrees C or 63 degrees F. A value too high or too low would require reassessment of the dataset, since humans require livable temperatures.
 
-###Step 3
+### Step 3
 ***Analyze global trends by decade and century***
 ```{r step3}
 global_temps <-  na.omit(global_temps)
@@ -250,7 +250,7 @@ century_year_temp_data_boxplot
 
 Using the line graph and box plot, it can be determined that mean surface temperatures are increasing with every decade. This is consistent with the general consensus that the climate has been warming over time.
 
-###Step 4
+### Step 4
 ***Hypothesis Tests***
 ```{r step 4}
 #are 1900s and 2000s statistically different?
@@ -266,7 +266,7 @@ century_ttest
 
 Using a two-sample t-test, differences between average surface temperatures in the 1900s and 2000s were analyzed. The two-sample t-test yielded a p-value of [`r format(century_ttest$p.value)`]. Due to the very low p-value, the null hypothesis is rejected implying that the temperature in 1900s and 2000s are slightly different in that there is a slight increase from 1900s to 2000s.
 
-###Step 5: Begin Model Building 
+### Step 5: Begin Model Building 
 ***Data Cleaning for Linear Regression**
 ```{r step5}
 #format dataset to single observation by country per year
@@ -320,7 +320,7 @@ temp_data <- merge(climate_change, summary_temp_data, by=c("Country", "Year"))
 
 ```
 
-###Step 6
+### Step 6
 ***Linear Regression***
 ```{r step6}
 #correlation plot
@@ -355,7 +355,7 @@ Surface temperature (Celsius) = 15.70 + 0.116 * Renew_Energy_Pct - 0.0026 * Ener
 Where the variable units for renewable energy percent resulted from the percentage of total energy usage and energy use equals kilogram of oil equivalent per capita. CO2 emissions are reported in metric tons per capita and forest area in square kilometers.
 The R Squared for the revised model is `r format(summary(model2)$r.squared * 100)`% .
 
-###Pull Additional Indicators for Feature Selection
+### Pull Additional Indicators for Feature Selection
 ```{r}
 #electricity access (% of population)
 electricity <- data.frame(read_xls("Datasets/electricity.xls"))
@@ -414,7 +414,7 @@ temp_data <- merge(climate_change, summary_temp_data, by=c("Country", "Year"))
 
 ```
 
-###Step 7
+### Step 7
 ***Regional Linear Regression - Africa***
 ```{r step7}
 #correlation plot
@@ -433,7 +433,7 @@ summary(africa_model)
 
 For the Africa region, the following variables are significant at the 99% confidence level: renewable energy percentage and forest area. The variables found insignificant by the model was energy use and CO2 emissions. The R Squared is `r format(summary(africa_model)$r.squared * 100)`%.
 
-###Step 8
+### Step 8
 ***Regional Linear Regression - Americas***
 ```{r step8}
 #correlation plot
@@ -453,7 +453,7 @@ summary(americas_model)
 
 For the Americas region, all variables are significant at the 99% confidence level. The R Squared is `r format(summary(americas_model)$r.squared * 100)` % .
 
-###Step 9
+### Step 9
 ***Regional Linear Regression - Asia***
 ```{r step9}
 #correlation plot
@@ -472,7 +472,7 @@ summary(asia_model)
 
 For the Asia region, all variables are significant at the 99% confidence level. The R Squared is `r format(summary(asia_model)$r.squared * 100)`% .
 
-###Step 10
+### Step 10
 ***Regional Linear Regression - Europe***
 ```{r step10}
 #correlation plot
@@ -491,7 +491,7 @@ summary(europe_model)
 
 For the Europe region, the following variables are significant at the 99% confidence level: renewable energy percentage and CO2 emissions. The variables found insignificant by the model was energy use and forest area. The R Squared is `r format(summary(europe_model)$r.squared * 100)`% .
 
-###Step 11
+### Step 11
 ***Regional Linear Regression - Oceania***
 ```{r step11}
 #correlation plot
@@ -510,7 +510,7 @@ summary(oceania_model)
 
 For the Oceania region, the following variables are significant at the 99% confidence level: renewable energy percentage, energy use, and CO2 emissions. Forest area is significant at the 95% confidence level. The R Squared is `r format(summary(oceania_model)$r.squared * 100)`% .
 
-###Interpretation of Linear Models by Region
+### Interpretation of Linear Models by Region
 
 While the linear models for the Americas and Asia agreed that all variables were statistically significant, they displayed dramatically different R-squared values. A possible interpretation is that the R-squared value for the Americas was higher than that of Asia because of a higher intensity in the predictor variables. For example, while CO2 emissions were significant for both regions, the Americas potentially emitted more, giving this predictor a higher influence on the final R-squared. 
 
@@ -521,7 +521,7 @@ As for energy use and CO2 emissions being insignificant in Africa, this might be
 Oceania, Africa and Europe display similar disparities in R-squared values to those between the Americas and Asia. In Europe the model had the lowest R-squared values, followed by Africa and then Oceania with the largest R-squared values. Europe having the lowest R-squared value is somewhat unexpected given that it had an industrial revolution and CO2 emissions similar to that seen in the Americas. We believe that the R-squared value is so low because Europe had the greatest time span of the regions in the dataset. While the time record for the Americas begins post-colonization and essentially at the start of the industrial revolution, Europe had almost an entire century of no emissions or significant energy use that reduces the magnitude of these predictor variables.
 
 
-###Step 12
+### Step 12
 ***Rebuild Linear Regression with new variables***
 ```{r step12}
 #correlation plot
@@ -547,7 +547,7 @@ Surface Temperature (Celsius) = 21.84 + 0.159* Pollution_exposure -  0.125 * Ele
 The R-squared value of this model was 0.334 or 33.4%.
 
 
-###Step 13
+### Step 13
 ***Feature Selection (Adjusted R^2)***
 ```{r step13}
 loadPkg("leaps")
@@ -566,7 +566,7 @@ faraway::vif(adj_model)
 
 ```
 
-###Step 14
+### Step 14
 ***Feature Selection (BIC)***
 ```{r step14}
 bic_selection <- regsubsets(Temperature~., data = temp_data_clean2, nbest = 2, method = "exhaustive") 
@@ -581,7 +581,7 @@ faraway::vif(bic_model)
 
 ```
 
-###Step 15
+### Step 15
 ***Feature Selection (Cp)***
 ```{r step15}
 cp_selection <- regsubsets(Temperature~., data = temp_data_clean2, nbest = 2, method = "exhaustive") 
@@ -594,11 +594,11 @@ faraway::vif(cp_model)
 
 ```
 
-###Interpretation of Optimized Model
+### Interpretation of Optimized Model
 After using feature selection to compare models, it was found that the model Surface Temperature (Celsius) = 21.84 + 0.159* Pollution_exposure -  0.125 * Electricity_ access -  0.0014* Energy_use + 0.065* Urban_population + 0.322*Co2_emissions
 was a more optimal model with a R-squared of 0.334 or 33.4%, which was an improvement from the preliminary linear model of Surface temperature (celsius) =  15.70 + 0.116 * Renew_energy_pct - 0.0026 * Energy_use + 0.9250* Co2_emissions - 0.0000012* Forest_area, which had an R-Squared of 0.235 or 23.5%.  
 
-###Global Time Series Analysis
+### Global Time Series Analysis
 ```{r}
 #create summary dataset
 loadPkg("dplyr")
@@ -625,12 +625,12 @@ plot.ts(ts2, type ="l", col="blue", lwd=2,
 loadPkg("forecast")
 loadPkg("zoo")
 model1 <- auto.arima(as.zoo(ts2))
-forecast(model, 40)
-plot1 <- plot(forecast(model, 40), main = "Global Temperature Predictions until 2053", xlab = "Year", ylab = "Average Temperature (Celcius)")
+forecast(model1, 40)
+plot1 <- plot(forecast(model1, 40), main = "Global Temperature Predictions until 2053", xlab = "Year", ylab = "Average Temperature (Celcius)")
 
 ```
 
-###United States Analysis
+### United States Analysis
 ```{r}
 US_temps <- subset(global_temps, global_temps$Country == "United States")
 
@@ -659,7 +659,7 @@ plot2 <- plot(forecast(model2, 40), main = "United States Temperature Prediction
 
 ```
 
-###Iceland Analysis
+### Iceland Analysis
 ```{r}
 Iceland_temps <- subset(global_temps, global_temps$Country == "Iceland")
 
@@ -682,7 +682,7 @@ forecast(model3, 40)
 plot3 <- plot(forecast(model3, 40), main = "Iceland Temperature Predictions until 2053", xlab = "Year", ylab = "Average Temperature (Celcius)")
 ```
 
-###Haiti Analysis
+### Haiti Analysis
 ```{r}
 Haiti_temps <- subset(global_temps, global_temps$Country == "Haiti")
 
@@ -707,10 +707,10 @@ plot4 <- plot(forecast(model4, 40), main = "Haiti Temperature Predictions until 
 
 Lastly, time series analysis was used to answer the third SMART question. The first time series analysis looked at the global scale and summarized temperatures from 1743-2013 and then forecasted predictions up to the year 2053. To further explore trends over the next century, specific countries were selected from different regions, namely the United States of America, Haiti and Iceland. For these individual time series, temperatures from 1900-2013 were summarized and predictions were forecasted up to the year 2053.
 
-###Interpretation of Time Series Analysis
+### Interpretation of Time Series Analysis
 The time series analysis projected surface temperature to rise globally for the period up to 2053. For the United States and Haiti, the time series analysis also forecasted rising temperatures. Iceland, however, did not have any conclusive trend upwards or downwards in predicted temperatures. Because this refutes general climate trends, the original dataset was examined for any errors within the recordings for Iceland. Although there were not any obvious missing records or alarming entries, there is most likely some error causing the discrepancy between published trends and the data analysis for this project.
 
-#Conclusions
+# Conclusions
 SMART Question 1: What are the temperature trends by region?
 From 1743 to 2013, the Americas experienced the greatest temperature change.  The highest mean surface temperatures were found in Oceania and Africa, followed by the Americas and Asia, with the coldest mean temperatures occurring in Europe.  There were also noticeable temperature increases most notably beginning in the early-to-mid 1800s for all regions.  Lastly, surface temperatures were found to be different across all regions.
 
@@ -720,7 +720,7 @@ After using feature selection to compare models, it was found that the second mo
 SMART Question 3: What are the predicted temperature trends over the next century? 
 Surface temperatures are projected to rise globally until 2053.  This is consistent with the predictions of many climate models. Surface temperatures were also projected to rise in the United States and Haiti.  Based on the results for this project, there does not seem to be a projected rise or fall in surface temperatures for Iceland.  This finding is interesting and contradictory to what is generally expected.  Based on the Third Report on Impacts of Climate Change in Iceland from the Iceland Meteorological Office, there is a projected 1.34–2.10°C warming depending on RCP scenario (2.6 or 8.5) in the middle of this century and a 1.50–4.10°C warming for the last decade of the 21st century (Third Report on Impacts of Climate Change in Iceland).  Perhaps, there were errors in the Iceland dataset or the timeframe used in the time series analysis did not allow for the correct projection to be made.  
 
-#References
+# References
 
 Luyssaert, S., Schulze, E. D., Börner, A., Knohl, A., Hessenmöller, D., Law, B. E., ... & Grace, J. 
 (2008). Old-growth forests as global carbon sinks. Nature, 455(7210), 213-215.
