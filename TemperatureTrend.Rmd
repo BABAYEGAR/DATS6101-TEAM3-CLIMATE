@@ -721,6 +721,8 @@ SMART Question 3: What are the predicted temperature trends over the next centur
 Surface temperatures are projected to rise globally until 2053.  This is consistent with the predictions of many climate models. Surface temperatures were also projected to rise in the United States and Haiti.  Based on the results for this project, there does not seem to be a projected rise or fall in surface temperatures for Iceland.  This finding is interesting and contradictory to what is generally expected.  Based on the Third Report on Impacts of Climate Change in Iceland from the Iceland Meteorological Office, there is a projected 1.34–2.10°C warming depending on RCP scenario (2.6 or 8.5) in the middle of this century and a 1.50–4.10°C warming for the last decade of the 21st century (Third Report on Impacts of Climate Change in Iceland).  Perhaps, there were errors in the Iceland dataset or the timeframe used in the time series analysis did not allow for the correct projection to be made.  
 
 # References
+Kaggle. (1743–2013). Climate Change: Earth Surface Temperature Data [Dataset]. 
+https://www.kaggle.com/berkeleyearth/climate-change-earth-surface-temperature-data
 
 Luyssaert, S., Schulze, E. D., Börner, A., Knohl, A., Hessenmöller, D., Law, B. E., ... & Grace, J. 
 (2008). Old-growth forests as global carbon sinks. Nature, 455(7210), 213-215.
@@ -731,4 +733,33 @@ greenhouse effect. Entrepreneurship and Sustainability Issues, 7(4), 2897.
 Overland, J. E., Hanna, E., Hanssen-Bauer, I., Kim, S. J., Walsh, J. E., Wang, M., Bhatt, U.S., & 
 Thoman, R. L. (2017). Surface air temperature. Arctic report card.
 
-Third Report on Impacts of Climate Change in Iceland. (n.d.). Retrieved May 05, 2021, from https://en.vedur.is/climatology/iceland/climate-report
+Third Report on Impacts of Climate Change in Iceland. (n.d.). Retrieved May 05, 2021, 
+from https://en.vedur.is/climatology/iceland/climate-report
+
+World Bank. (1990–2013a). Access to electricity (% of population) [Dataset]. 
+https://data.worldbank.org/indicator/EG.ELC.ACCS.ZS?view=chart
+
+World Bank. (1990–2013b). Annual freshwater withdrawals, total (billion cubic meters) [Dataset]. https://data.worldbank.org/indicator/ER.H2O.FWTL.K3?view=chart
+
+World Bank. (1990–2013). CO2 emissions (metric tons per capita) [Dataset]. 
+https://data.worldbank.org/indicator/EN.ATM.CO2E.PC?view=chart
+
+World Bank. (1990–2013b). Energy use (kg of oil equivalent per capita) [Dataset]. 
+https://data.worldbank.org/indicator/EG.USE.PCAP.KG.OE?view=chart
+
+World Bank. (1990–2013c). Fossil fuel energy consumption (% of total) [Dataset].
+https://data.worldbank.org/indicator/EG.USE.COMM.FO.ZS?view=chart
+
+World Bank. (1990–2013c). Forest area (sq. km) [Dataset]. 
+https://data.worldbank.org/indicator/AG.LND.FRST.K2?view=chart
+
+World Bank. (1990–2013d). PM2.5 air pollution, population exposed to levels exceeding WHO guideline value (% of total) [Dataset]. https://data.worldbank.org/indicator/EN.ATM.PM25.MC.ZS?view=chart
+
+World Bank. (1990–2013d). Population, total [Dataset]. 
+https://data.worldbank.org/indicator/SP.POP.TOTL?view=chart
+
+World Bank. (1990–2013e). Renewable energy consumption (% of total final energy consumption) [Dataset]. 
+https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS?view=chart
+
+World Bank. (1990–2013e). Urban population (% of total population) [Dataset]. 
+https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS?view=chart
